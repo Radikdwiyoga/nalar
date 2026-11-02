@@ -1,17 +1,30 @@
-import { Sidebar } from '@/components/sidebar';
+import { createClient } from '@/lib/supabase/server';
+import { DashboardShell } from '@/components/layout/dashboard-shell';
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let profile = null;
+  if (user) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+    profile = data;
+  }
+
+  const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Pengguna';
+  const userEmail = user?.email || '';
+
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {children}
-      </main>
-    </div>
+    <DashboardShell displayName={displayName} userEmail={userEmail}>
+      {children}
+    </DashboardShell>
   );
 }
-

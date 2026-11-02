@@ -23,7 +23,7 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
       )}
 
       <div
-        className={`max-w-[85%] rounded-2xl p-4 space-y-2.5 ${
+        className={`max-w-[92%] sm:max-w-[85%] rounded-2xl p-3 sm:p-4 space-y-2.5 ${
           isUser
             ? 'bg-primary text-primary-foreground rounded-tr-sm'
             : 'bg-card border rounded-tl-sm shadow-sm'

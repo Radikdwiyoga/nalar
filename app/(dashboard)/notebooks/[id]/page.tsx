@@ -1,8 +1,10 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, BookOpen, Layers, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, BookOpen, Layers, Loader2, MessageSquare, Sparkles } from 'lucide-react';
 import { Source, Citation } from '@/lib/types';
 import { UploadDropzone } from '@/components/sources/upload-dropzone';
 import { SourceList } from '@/components/sources/source-list';
@@ -19,6 +21,9 @@ export default function NotebookDetailPage({
   const [notebook, setNotebook] = useState<any>(null);
   const [sources, setSources] = useState<Source[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Mobile active tab: 'chat' | 'sources'
+  const [mobileTab, setMobileTab] = useState<'chat' | 'sources'>('chat');
 
   // Source viewer state
   const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
@@ -65,33 +70,63 @@ export default function NotebookDetailPage({
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden bg-background">
       {/* Top Header */}
-      <header className="h-14 border-b bg-card px-4 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-3">
+      <header className="h-14 border-b bg-card px-3 sm:px-4 flex items-center justify-between shrink-0 z-10">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link
             href="/notebooks"
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition"
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition shrink-0"
             title="Kembali ke Daftar Notebook"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
-          <div className="flex items-center gap-2">
-            <h1 className="font-bold text-sm tracking-tight truncate max-w-xs sm:max-w-md">
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="font-bold text-xs sm:text-sm tracking-tight truncate max-w-[150px] sm:max-w-xs md:max-w-md">
               {notebook.title}
             </h1>
-            <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+            <span className="hidden sm:inline-flex text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium shrink-0">
               {readySources.length} sumber aktif
             </span>
           </div>
         </div>
+
+        {/* Mobile Tab Switcher (Chat vs Sumber) */}
+        <div className="flex md:hidden items-center bg-muted/60 p-1 rounded-lg border text-xs shrink-0">
+          <button
+            onClick={() => setMobileTab('chat')}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-all ${
+              mobileTab === 'chat'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground'
+            }`}
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Chat</span>
+          </button>
+          <button
+            onClick={() => setMobileTab('sources')}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-all ${
+              mobileTab === 'sources'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>Sumber ({sources.length})</span>
+          </button>
+        </div>
       </header>
 
-      {/* Main split work area */}
-      <div className="flex-1 flex min-h-0">
-        {/* Left sources panel */}
-        <div className="w-72 lg:w-80 border-r bg-muted/10 flex flex-col h-full shrink-0">
-          <div className="p-4 border-b flex items-center justify-between">
+      {/* Main Work Area */}
+      <div className="flex-1 flex min-h-0 relative overflow-hidden">
+        {/* Sources Panel */}
+        <div
+          className={`${
+            mobileTab === 'sources' ? 'flex w-full' : 'hidden'
+          } md:flex md:w-72 lg:w-80 border-r bg-muted/10 flex-col h-full shrink-0 overflow-hidden`}
+        >
+          <div className="p-3.5 border-b flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
               <Layers className="w-4 h-4 text-primary" />
               <span>Sumber Dokumen</span>
@@ -101,7 +136,7 @@ export default function NotebookDetailPage({
             </span>
           </div>
 
-          <div className="p-4 flex-1 overflow-y-auto space-y-4">
+          <div className="p-3 sm:p-4 flex-1 overflow-y-auto space-y-4">
             <UploadDropzone
               notebookId={notebookId}
               onUploaded={fetchNotebookData}
@@ -119,17 +154,23 @@ export default function NotebookDetailPage({
           </div>
         </div>
 
-        {/* Center chat panel */}
-        <ChatPanel
-          notebookId={notebookId}
-          readySourceCount={readySources.length}
-          onCitationClick={(cit) => {
-            setActiveCitation(cit);
-            setSelectedSourceId(cit.sourceId);
-          }}
-        />
+        {/* Chat Panel */}
+        <div
+          className={`${
+            mobileTab === 'chat' ? 'flex' : 'hidden'
+          } md:flex flex-1 flex-col h-full min-w-0 overflow-hidden`}
+        >
+          <ChatPanel
+            notebookId={notebookId}
+            readySourceCount={readySources.length}
+            onCitationClick={(cit) => {
+              setActiveCitation(cit);
+              setSelectedSourceId(cit.sourceId);
+            }}
+          />
+        </div>
 
-        {/* Right source viewer drawer */}
+        {/* Source Viewer Drawer (Responsive Slide-over) */}
         {(selectedSourceId || activeCitation) && (
           <SourceViewer
             sourceId={selectedSourceId}
@@ -144,4 +185,3 @@ export default function NotebookDetailPage({
     </div>
   );
 }
-

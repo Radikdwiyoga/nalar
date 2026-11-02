@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { Plus, BookOpen, Clock, FileText, Trash2, Loader2, FolderPlus } from 'lucide-react';
 import { Notebook } from '@/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 export default function NotebooksPage() {
   const [notebooks, setNotebooks] = useState<Notebook[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,9 +79,9 @@ export default function NotebooksPage() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto w-full space-y-8">
+    <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto w-full space-y-6 sm:space-y-8">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-4 sm:pb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Notebook Saya</h1>
           <p className="text-sm text-muted-foreground mt-1">

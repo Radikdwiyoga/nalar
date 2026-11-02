@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from 'react';
 import { Loader2, MessageSquare, Sparkles, UploadCloud, Cpu, CheckCircle } from 'lucide-react';
 import { Profile } from '@/lib/types';
@@ -68,7 +70,7 @@ export default function SettingsPage() {
   const tokenPercent = Math.min(100, Math.round((usage.tokens / limits.daily_token_limit) * 100));
 
   return (
-    <div className="p-8 max-w-4xl mx-auto w-full space-y-8">
+    <div className="p-4 sm:p-6 md:p-8 max-w-4xl mx-auto w-full space-y-6 sm:space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Pengaturan & Kuota</h1>
         <p className="text-sm text-muted-foreground mt-1">

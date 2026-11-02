@@ -198,7 +198,7 @@ export function ChatPanel({
   return (
     <div className="flex-1 flex flex-col h-full bg-background relative overflow-hidden">
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 space-y-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center max-w-md mx-auto p-6 space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-sm">
@@ -245,7 +245,7 @@ export function ChatPanel({
       </div>
 
       {/* Input area */}
-      <div className="p-4 border-t bg-card/50 backdrop-blur sticky bottom-0">
+      <div className="p-2.5 sm:p-4 border-t bg-card/80 backdrop-blur sticky bottom-0 z-10">
         <form onSubmit={handleSend} className="max-w-4xl mx-auto flex gap-2">
           <textarea
             rows={1}
@@ -260,16 +260,16 @@ export function ChatPanel({
             placeholder={
               readySourceCount === 0
                 ? 'Unggah sumber dokumen terlebih dahulu...'
-                : 'Tanyakan sesuatu tentang dokumen Anda... (Enter untuk kirim)'
+                : 'Tanyakan sesuatu... (Enter untuk kirim)'
             }
-            className="flex-1 px-4 py-3 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none min-h-[48px] max-h-32"
+            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border bg-background text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none min-h-[44px] sm:min-h-[48px] max-h-32"
           />
 
           {isStreaming ? (
             <button
               type="button"
               onClick={handleStop}
-              className="px-4 bg-destructive text-destructive-foreground rounded-xl flex items-center justify-center hover:bg-destructive/90 transition shadow-sm"
+              className="px-3.5 sm:px-4 bg-destructive text-destructive-foreground rounded-xl flex items-center justify-center hover:bg-destructive/90 transition shadow-sm shrink-0"
               title="Hentikan Jawaban"
             >
               <Square className="w-4 h-4" />
@@ -278,7 +278,7 @@ export function ChatPanel({
             <button
               type="submit"
               disabled={!input.trim()}
-              className="px-4 bg-primary text-primary-foreground rounded-xl flex items-center justify-center hover:bg-primary/90 disabled:opacity-50 transition shadow-sm"
+              className="px-3.5 sm:px-4 bg-primary text-primary-foreground rounded-xl flex items-center justify-center hover:bg-primary/90 disabled:opacity-50 transition shadow-sm shrink-0"
               title="Kirim Pertanyaan"
             >
               <Send className="w-4 h-4" />
