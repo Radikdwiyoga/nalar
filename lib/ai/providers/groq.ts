@@ -10,7 +10,7 @@ function getClient() {
 }
 
 export async function generateGroqStream({
-  model = process.env.GROQ_CHAT_MODEL || 'llama-3.3-70b-versatile',
+  model = process.env.GROQ_CHAT_MODEL || 'openai/gpt-oss-120b',
   messages,
   temperature = 0.2,
   signal,

@@ -31,10 +31,11 @@ export interface ChatResult {
 }
 
 const DEFAULT_ROUTES: RouteConfig[] = [
-  { provider: 'gemini', model: process.env.GEMINI_CHAT_MODEL || 'gemini-2.5-flash' },
-  { provider: 'groq', model: process.env.GROQ_CHAT_MODEL || 'llama-3.3-70b-versatile' },
-  { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_ALT || 'gpt-oss-120b' },
-  { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_FAST || 'llama-3.1-8b-instant' },
+  { provider: 'gemini', model: process.env.GEMINI_CHAT_MODEL || 'gemini-3.1-flash-lite' },
+  { provider: 'gemini', model: 'gemini-3.8-flash' },
+  { provider: 'groq', model: process.env.GROQ_CHAT_MODEL || 'openai/gpt-oss-120b' },
+  { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_ALT || 'openai/gpt-oss-20b' },
+  { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_FAST || 'qwen/qwen3.8-27b' },
 ];
 
 export async function chat(req: ChatRequest): Promise<ChatResult> {
