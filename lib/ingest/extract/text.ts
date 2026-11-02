@@ -36,3 +36,4 @@ export function extractCsv(raw: string): {
     charCount: content.length,
   };
 }
+

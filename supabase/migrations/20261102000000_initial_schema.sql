@@ -393,3 +393,4 @@ FROM fused
 JOIN source_chunks sc ON sc.id = fused.id
 ORDER BY fused.rrf DESC;
 $$;
+

@@ -98,3 +98,4 @@ export async function recordFailure(route: RouteIdentifier, errorKind: string, e
     // ignore
   }
 }
+

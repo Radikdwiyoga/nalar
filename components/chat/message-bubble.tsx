@@ -73,3 +73,4 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
     </div>
   );
 }
+

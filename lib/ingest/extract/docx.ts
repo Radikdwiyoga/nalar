@@ -11,3 +11,4 @@ export async function extractDocx(buffer: Buffer): Promise<{
     charCount: text.length,
   };
 }
+

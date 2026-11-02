@@ -40,3 +40,4 @@ export async function extractPdf(buffer: Uint8Array): Promise<{
     charCount: totalChars,
   };
 }
+

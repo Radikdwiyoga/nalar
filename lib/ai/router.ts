@@ -140,3 +140,4 @@ export async function embed(texts: string[]): Promise<number[][]> {
     throw err;
   }
 }
+

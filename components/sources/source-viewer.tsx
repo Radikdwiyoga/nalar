@@ -109,3 +109,4 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
     </div>
   );
 }
+

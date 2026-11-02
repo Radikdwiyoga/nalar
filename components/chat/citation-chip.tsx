@@ -26,3 +26,4 @@ export function CitationChip({ citation, onClick }: CitationChipProps) {
     </button>
   );
 }
+
