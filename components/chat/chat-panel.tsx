@@ -1,0 +1,291 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+import { ChatMessage, Citation } from '@/lib/types';
+import { MessageBubble } from './message-bubble';
+import { Send, Square, Sparkles, Loader2 } from 'lucide-react';
+
+interface ChatPanelProps {
+  notebookId: string;
+  onCitationClick: (citation: Citation) => void;
+  readySourceCount: number;
+}
+
+export function ChatPanel({
+  notebookId,
+  onCitationClick,
+  readySourceCount,
+}: ChatPanelProps) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [threadId, setThreadId] = useState<string | null>(null);
+
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const scrollEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    scrollEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const handleSend = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const query = input.trim();
+    if (!query || isStreaming) return;
+
+    setInput('');
+    const userMsg: ChatMessage = {
+      id: crypto.randomUUID(),
+      thread_id: threadId || '',
+      user_id: '',
+      role: 'user',
+      content: query,
+      citations: [],
+      created_at: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+    setIsStreaming(true);
+
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
+    const assistantMsgId = crypto.randomUUID();
+    const placeholderAssistantMsg: ChatMessage = {
+      id: assistantMsgId,
+      thread_id: threadId || '',
+      user_id: '',
+      role: 'assistant',
+      content: '',
+      citations: [],
+      created_at: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, placeholderAssistantMsg]);
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          notebookId,
+          threadId,
+          question: query,
+        }),
+        signal: abortController.signal,
+      });
+
+      if (!res.ok) {
+        const errorJson = await res.json().catch(() => null);
+        throw new Error(
+          errorJson?.error?.message || `Server error (${res.status})`
+        );
+      }
+
+      if (!res.body) {
+        throw new Error('Response body is empty');
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n\n');
+        buffer = lines.pop() || '';
+
+        for (const block of lines) {
+          const rawLines = block.split('\n');
+          let eventType = '';
+          let dataStr = '';
+
+          for (const line of rawLines) {
+            if (line.startsWith('event: ')) {
+              eventType = line.slice(7).trim();
+            } else if (line.startsWith('data: ')) {
+              dataStr = line.slice(6).trim();
+            }
+          }
+
+          if (!eventType || !dataStr) continue;
+
+          try {
+            const data = JSON.parse(dataStr);
+
+            if (eventType === 'meta') {
+              if (data.threadId) setThreadId(data.threadId);
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? { ...m, provider: data.provider, model: data.model }
+                    : m
+                )
+              );
+            } else if (eventType === 'delta') {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? { ...m, content: m.content + data.text }
+                    : m
+                )
+              );
+            } else if (eventType === 'citations') {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? { ...m, citations: data.citations || [] }
+                    : m
+                )
+              );
+            } else if (eventType === 'done') {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? { ...m, latency_ms: data.latencyMs }
+                    : m
+                )
+              );
+            } else if (eventType === 'error') {
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? { ...m, content: m.content + `\n\n*[${data.message}]*` }
+                    : m
+                )
+              );
+            }
+          } catch (parseErr) {
+            console.error('Error parsing SSE block:', parseErr);
+          }
+        }
+      }
+    } catch (err: any) {
+      if (err.name !== 'AbortError') {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantMsgId
+              ? {
+                  ...m,
+                  content:
+                    m.content ||
+                    `Maaf, terjadi kendala saat memproses: ${err.message}`,
+                }
+              : m
+          )
+        );
+      }
+    } finally {
+      setIsStreaming(false);
+      abortControllerRef.current = null;
+    }
+  };
+
+  const handleStop = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setIsStreaming(false);
+    }
+  };
+
+  return (
+    <div className="flex-1 flex flex-col h-full bg-background relative overflow-hidden">
+      {/* Messages area */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-center max-w-md mx-auto p-6 space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-sm">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-lg">Mulai Tanya Jawab</h3>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {readySourceCount === 0
+                ? 'Unggah dan tunggu dokumen Anda siap untuk mulai bertanya dengan sitasi akurat.'
+                : `Terdapat ${readySourceCount} dokumen aktif siap digunakan sebagai acuan jawaban.`}
+            </p>
+
+            {readySourceCount > 0 && (
+              <div className="flex flex-col gap-2 w-full pt-2">
+                <button
+                  onClick={() => {
+                    setInput('Buatkan ringkasan dari dokumen yang diunggah.');
+                  }}
+                  className="p-2.5 rounded-lg border text-xs text-left bg-card hover:bg-muted/50 transition-colors"
+                >
+                  📄 &quot;Buatkan ringkasan dari dokumen yang diunggah.&quot;
+                </button>
+                <button
+                  onClick={() => {
+                    setInput('Apa poin-poin terpenting dan temuan utamanya?');
+                  }}
+                  className="p-2.5 rounded-lg border text-xs text-left bg-card hover:bg-muted/50 transition-colors"
+                >
+                  💡 &quot;Apa poin-poin terpenting dan temuan utamanya?&quot;
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          messages.map((m) => (
+            <MessageBubble
+              key={m.id}
+              message={m}
+              onCitationClick={onCitationClick}
+            />
+          ))
+        )}
+        <div ref={scrollEndRef} />
+      </div>
+
+      {/* Input area */}
+      <div className="p-4 border-t bg-card/50 backdrop-blur sticky bottom-0">
+        <form onSubmit={handleSend} className="max-w-4xl mx-auto flex gap-2">
+          <textarea
+            rows={1}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            placeholder={
+              readySourceCount === 0
+                ? 'Unggah sumber dokumen terlebih dahulu...'
+                : 'Tanyakan sesuatu tentang dokumen Anda... (Enter untuk kirim)'
+            }
+            className="flex-1 px-4 py-3 rounded-xl border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none min-h-[48px] max-h-32"
+          />
+
+          {isStreaming ? (
+            <button
+              type="button"
+              onClick={handleStop}
+              className="px-4 bg-destructive text-destructive-foreground rounded-xl flex items-center justify-center hover:bg-destructive/90 transition shadow-sm"
+              title="Hentikan Jawaban"
+            >
+              <Square className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={!input.trim()}
+              className="px-4 bg-primary text-primary-foreground rounded-xl flex items-center justify-center hover:bg-primary/90 disabled:opacity-50 transition shadow-sm"
+              title="Kirim Pertanyaan"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          )}
+        </form>
+      </div>
+    </div>
+  );
+}
