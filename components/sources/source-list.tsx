@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Source } from '@/lib/types';
 import { formatBytes } from '@/lib/utils';
-import { FileText, Loader2, CheckCircle2, AlertTriangle, Trash2, Eye } from 'lucide-react';
+import { FileText, Loader2, CheckCircle2, AlertTriangle, Trash2, RotateCw } from 'lucide-react';
 
 interface SourceListProps {
   sources: Source[];
@@ -18,6 +18,8 @@ export function SourceList({
   onSelectSource,
   selectedSourceId,
 }: SourceListProps) {
+  const [retryingId, setRetryingId] = useState<string | null>(null);
+
   // Client-driven ingestion trigger: if any source is queued, trigger ingestion
   useEffect(() => {
     const queuedSources = sources.filter((s) => s.status === 'queued');
@@ -58,6 +60,19 @@ export function SourceList({
     }
   };
 
+  const handleRetry = async (sourceId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRetryingId(sourceId);
+    try {
+      await fetch(`/api/sources/${sourceId}/ingest`, { method: 'POST' });
+      onRefresh();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setRetryingId(null);
+    }
+  };
+
   const handleDelete = async (sourceId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!confirm('Hapus dokumen sumber ini?')) return;
@@ -83,8 +98,8 @@ export function SourceList({
       {sources.map((source) => {
         const isSelected = selectedSourceId === source.id;
         const isReady = source.status === 'ready';
-        const isProcessing = source.status === 'queued' || source.status === 'processing';
-        const isFailed = source.status === 'failed';
+        const isProcessing = source.status === 'queued' || source.status === 'processing' || retryingId === source.id;
+        const isFailed = source.status === 'failed' && retryingId !== source.id;
 
         return (
           <div
@@ -141,10 +156,20 @@ export function SourceList({
                   </span>
                 )}
                 {isFailed && (
-                  <span className="inline-flex items-center gap-1 text-destructive font-medium" title={source.error_message || 'Gagal'}>
-                    <AlertTriangle className="w-3 h-3" />
-                    Gagal
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1 text-destructive font-medium" title={source.error_message || 'Gagal'}>
+                      <AlertTriangle className="w-3 h-3" />
+                      Gagal
+                    </span>
+                    <button
+                      onClick={(e) => handleRetry(source.id, e)}
+                      title="Coba proses ulang dokumen"
+                      className="p-1 text-primary hover:bg-primary/10 rounded transition inline-flex items-center gap-0.5"
+                    >
+                      <RotateCw className="w-3 h-3" />
+                      <span>Ulangi</span>
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
@@ -154,4 +179,3 @@ export function SourceList({
     </div>
   );
 }
-

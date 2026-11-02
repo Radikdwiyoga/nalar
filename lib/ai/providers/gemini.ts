@@ -90,21 +90,28 @@ export async function generateGeminiEmbeddings(
 ): Promise<number[][]> {
   try {
     const ai = getClient();
-    const model = process.env.GEMINI_EMBED_MODEL || 'text-embedding-004';
+    const model = process.env.GEMINI_EMBED_MODEL || 'gemini-embedding-001';
+    const dim = parseInt(process.env.GEMINI_EMBED_DIM || '1536', 10);
 
-    // Batch embedding
     const results: number[][] = [];
-    for (const text of texts) {
+    const batchSize = 25;
+
+    for (let i = 0; i < texts.length; i += batchSize) {
+      const batch = texts.slice(i, i + batchSize);
       const response = await ai.models.embedContent({
         model,
-        contents: text,
+        contents: batch,
+        config: {
+          outputDimensionality: dim,
+        },
       });
 
-      const values = response.embeddings?.[0]?.values;
-      if (values) {
-        results.push(values);
-      } else {
-        throw new Error('No embedding returned from Gemini');
+      if (response.embeddings) {
+        for (const emb of response.embeddings) {
+          if (emb.values) {
+            results.push(emb.values);
+          }
+        }
       }
     }
 

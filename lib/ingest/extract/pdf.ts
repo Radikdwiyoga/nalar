@@ -1,4 +1,4 @@
-import { extractText, getDocumentProxy } from 'unpdf';
+import { extractText } from 'unpdf';
 
 export interface ExtractedPage {
   pageNumber: number;
@@ -10,12 +10,12 @@ export async function extractPdf(buffer: Uint8Array): Promise<{
   pageCount: number;
   charCount: number;
 }> {
-  const doc = await getDocumentProxy(buffer);
-  const pageCount = doc.numPages;
+  // Always use a fresh copy of the buffer to prevent ArrayBuffer detachment
+  const freshBuffer = new Uint8Array(buffer);
+  const { totalPages, text } = await extractText(freshBuffer, { mergePages: false });
+
   const pages: ExtractedPage[] = [];
   let totalChars = 0;
-
-  const { text } = await extractText(buffer, { mergePages: false });
 
   if (Array.isArray(text)) {
     for (let i = 0; i < text.length; i++) {
@@ -36,8 +36,7 @@ export async function extractPdf(buffer: Uint8Array): Promise<{
 
   return {
     pages,
-    pageCount,
+    pageCount: totalPages || pages.length,
     charCount: totalChars,
   };
 }
-
