@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -79,8 +80,15 @@ export default function SignupPage() {
     <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-muted/20">
       <div className="w-full max-w-md space-y-6 bg-card p-8 rounded-2xl border shadow-sm">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary text-primary-foreground font-bold text-xl mb-1 shadow-sm">
-            N
+          <div className="flex justify-center mb-2">
+            <Image
+              src="/logo-icon.png"
+              alt="Nalar Logo"
+              width={56}
+              height={56}
+              className="w-14 h-14 object-contain"
+              priority
+            />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Buat Akun Baru</h1>
           <p className="text-sm text-muted-foreground">

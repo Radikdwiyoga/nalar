@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { BookOpen, Settings, LogOut, Menu, X } from 'lucide-react';
 
@@ -44,9 +45,14 @@ export function DashboardShell({
         <aside className="hidden md:flex w-64 border-r bg-card flex-col justify-between shrink-0 h-screen sticky top-0 z-20">
           <div className="flex flex-col">
             <div className="h-14 px-6 border-b flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-base shadow-sm">
-                N
-              </div>
+              <Image
+                src="/logo-icon.png"
+                alt="Nalar Logo"
+                width={32}
+                height={32}
+                className="w-8 h-8 object-contain"
+                priority
+              />
               <span className="font-bold text-lg tracking-tight">Nalar</span>
             </div>
 
@@ -106,9 +112,13 @@ export function DashboardShell({
             <div className="flex flex-col">
               <div className="flex items-center justify-between pb-4 border-b">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-base shadow-sm">
-                    N
-                  </div>
+                  <Image
+                    src="/logo-icon.png"
+                    alt="Nalar Logo"
+                    width={32}
+                    height={32}
+                    className="w-8 h-8 object-contain"
+                  />
                   <span className="font-bold text-lg tracking-tight">Nalar</span>
                 </div>
                 <button
@@ -179,9 +189,13 @@ export function DashboardShell({
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <div className="w-7 h-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shadow-sm">
-                N
-              </div>
+              <Image
+                src="/logo-icon.png"
+                alt="Nalar Logo"
+                width={28}
+                height={28}
+                className="w-7 h-7 object-contain"
+              />
               <span className="font-bold text-base tracking-tight">Nalar</span>
             </div>
           </header>

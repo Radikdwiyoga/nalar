@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { BookOpen, Settings, LogOut, Sparkles, User as UserIcon } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
@@ -23,9 +24,14 @@ export async function Sidebar() {
       <div className="flex flex-col">
         {/* Logo / Brand */}
         <div className="h-16 px-6 border-b flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-base shadow-sm">
-            N
-          </div>
+          <Image
+            src="/logo-icon.png"
+            alt="Nalar Logo"
+            width={32}
+            height={32}
+            className="w-8 h-8 object-contain"
+            priority
+          />
           <span className="font-bold text-lg tracking-tight">Nalar</span>
         </div>
 

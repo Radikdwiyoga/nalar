@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, BookOpen, ShieldCheck, Zap, Layers, Sparkles } from 'lucide-react';
 
 export default function HomePage() {
@@ -7,10 +8,15 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b bg-card/50 backdrop-blur sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg shadow-sm">
-              N
-            </div>
+          <div className="flex items-center gap-2.5">
+            <Image
+              src="/logo-icon.png"
+              alt="Nalar Logo"
+              width={36}
+              height={36}
+              className="w-9 h-9 object-contain"
+              priority
+            />
             <span className="font-bold text-xl tracking-tight">Nalar</span>
           </div>
           <div className="flex items-center gap-4">
