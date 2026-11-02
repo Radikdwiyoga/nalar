@@ -31,9 +31,10 @@ export interface ChatResult {
 }
 
 const DEFAULT_ROUTES: RouteConfig[] = [
-  { provider: 'gemini', model: process.env.GEMINI_CHAT_MODEL || 'gemini-3.1-flash-lite' },
-  { provider: 'gemini', model: 'gemini-3.8-flash' },
   { provider: 'groq', model: process.env.GROQ_CHAT_MODEL || 'openai/gpt-oss-120b' },
+  { provider: 'gemini', model: process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash' },
+  { provider: 'gemini', model: 'gemini-3.5-flash-lite' },
+  { provider: 'gemini', model: 'gemini-flash-lite-latest' },
   { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_ALT || 'openai/gpt-oss-20b' },
   { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_FAST || 'qwen/qwen3.8-27b' },
 ];
@@ -115,9 +116,14 @@ export async function chat(req: ChatRequest): Promise<ChatResult> {
           error: `${classified.kind}: ${classified.message}`,
         });
 
-        // If error is not retryable (e.g. content filter or bad request), do not retry or fallback
-        if (!classified.retryable && classified.kind !== 'AUTH') {
+        // If user query was blocked by safety/content filter, abort immediately
+        if (classified.kind === 'CONTENT_FILTER') {
           throw classified;
+        }
+
+        // For non-retryable model/auth issues, skip directly to the next route without repeating
+        if (classified.kind === 'MODEL_GONE' || classified.kind === 'AUTH') {
+          break;
         }
 
         // If retryable and attempt is 0, back off briefly before 1 retry on the same provider
@@ -130,7 +136,11 @@ export async function chat(req: ChatRequest): Promise<ChatResult> {
     }
   }
 
-  throw lastError || new Error('Seluruh provider AI gagal merespons');
+  const attemptSummary = attempts
+    .map((a) => `${a.provider}:${a.model} [${a.outcome}${a.error ? ': ' + a.error : ''}]`)
+    .join(' | ');
+
+  throw new Error(attemptSummary || lastError?.message || 'Seluruh provider AI gagal merespons');
 }
 
 export async function embed(texts: string[]): Promise<number[][]> {

@@ -81,8 +81,9 @@ export function ChatPanel({
 
       if (!res.ok) {
         const errorJson = await res.json().catch(() => null);
+        const detail = errorJson?.error?.detail ? ` (${errorJson.error.detail})` : '';
         throw new Error(
-          errorJson?.error?.message || `Server error (${res.status})`
+          (errorJson?.error?.message || `Server error (${res.status})`) + detail
         );
       }
 
