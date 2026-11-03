@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { UploadCloud, FileText, Loader2, AlertCircle } from 'lucide-react';
+import { UploadCloud, FileText, Loader2, AlertCircle, Link as LinkIcon } from 'lucide-react';
+import { UrlInputModal } from './url-input-modal';
 
 interface UploadDropzoneProps {
   notebookId: string;
@@ -11,6 +12,7 @@ interface UploadDropzoneProps {
 export function UploadDropzone({ notebookId, onUploaded }: UploadDropzoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [urlModalOpen, setUrlModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -96,6 +98,24 @@ export function UploadDropzone({ notebookId, onUploaded }: UploadDropzoneProps) 
           </div>
         </div>
       </div>
+
+      {/* Add from Link / Google Drive Button */}
+      <button
+        type="button"
+        onClick={() => setUrlModalOpen(true)}
+        className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl border border-dashed border-border/80 bg-card hover:bg-muted/40 hover:border-primary/50 text-xs font-medium text-muted-foreground hover:text-foreground transition-all"
+      >
+        <LinkIcon className="w-3.5 h-3.5 text-primary" />
+        <span>Tambah dari Link / Google Drive</span>
+      </button>
+
+      {/* URL Input Modal */}
+      <UrlInputModal
+        notebookId={notebookId}
+        isOpen={urlModalOpen}
+        onClose={() => setUrlModalOpen(false)}
+        onUploaded={onUploaded}
+      />
 
       {error && (
         <div className="flex items-center gap-2 p-2.5 text-xs text-destructive bg-destructive/10 rounded-lg border border-destructive/20">

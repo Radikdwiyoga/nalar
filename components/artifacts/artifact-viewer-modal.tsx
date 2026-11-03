@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { X, Copy, Check, Download, Trash2, Sparkles, Calendar, Cpu } from 'lucide-react';
+import { X, Copy, Check, Download, Trash2, Sparkles, Calendar, Cpu, FileText, Loader2 } from 'lucide-react';
 import { Artifact, ArtifactKind } from '@/lib/types';
 
 interface ArtifactViewerModalProps {
@@ -26,6 +26,7 @@ export function ArtifactViewerModal({
   onDelete,
 }: ArtifactViewerModalProps) {
   const [copied, setCopied] = useState(false);
+  const [downloadingDocx, setDownloadingDocx] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   if (!artifact) return null;
@@ -45,7 +46,7 @@ export function ArtifactViewerModal({
     }
   };
 
-  const handleDownload = () => {
+  const handleDownloadMd = () => {
     const blob = new Blob([artifact.content_md], { type: 'text/markdown;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -56,6 +57,28 @@ export function ArtifactViewerModal({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadDocx = async () => {
+    setDownloadingDocx(true);
+    try {
+      const { markdownToDocxBlob } = await import('@/lib/export/docx');
+      const blob = await markdownToDocxBlob(artifact.title, artifact.content_md);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const safeTitle = artifact.title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+      a.href = url;
+      a.download = `${safeTitle || 'dokumen-sintesis'}.docx`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to export docx:', err);
+      alert('Gagal mengekspor file Word');
+    } finally {
+      setDownloadingDocx(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -128,13 +151,29 @@ export function ArtifactViewerModal({
               )}
             </button>
 
+            {/* Download DOCX */}
             <button
-              onClick={handleDownload}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border rounded-lg hover:bg-muted transition-colors"
+              onClick={handleDownloadDocx}
+              disabled={downloadingDocx}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100/60 transition-colors shadow-2xs"
+              title="Unduh Microsoft Word (.docx)"
+            >
+              {downloadingDocx ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <FileText className="w-3.5 h-3.5 text-blue-600" />
+              )}
+              <span className="hidden sm:inline">Word (.docx)</span>
+            </button>
+
+            {/* Download Markdown */}
+            <button
+              onClick={handleDownloadMd}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium border rounded-lg hover:bg-muted transition-colors"
               title="Unduh file .md"
             >
               <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Unduh</span>
+              <span className="hidden sm:inline">.md</span>
             </button>
 
             {onDelete && (
