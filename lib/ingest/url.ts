@@ -141,12 +141,25 @@ export async function fetchUrlResource(
       else fileName = 'gdrive-dokumen.bin';
     }
 
+    let finalContentType = contentType || 'application/octet-stream';
     const arrayBuf = await res.arrayBuffer();
     const buffer = Buffer.from(arrayBuf);
 
+    // Inspect magic bytes to guarantee proper file extension & MIME type
+    const magicHex = buffer.slice(0, 4).toString('hex');
+    if (magicHex === '25504446') {
+      if (!fileName.toLowerCase().endsWith('.pdf')) fileName += '.pdf';
+      finalContentType = 'application/pdf';
+    } else if (magicHex === '504b0304') {
+      if (!fileName.toLowerCase().endsWith('.docx') && !fileName.toLowerCase().endsWith('.xlsx')) {
+        fileName += '.docx';
+      }
+      finalContentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    }
+
     return {
       fileName,
-      mimeType: contentType || 'application/octet-stream',
+      mimeType: finalContentType,
       buffer,
       sourceType: 'gdrive_file',
       originalUrl: urlStr,

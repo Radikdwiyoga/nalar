@@ -54,13 +54,34 @@ export async function POST(
     const arrayBuffer = await fileBlob.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // 3. Extract text according to format
+    // 3. Extract text according to format (detect via magic bytes first, then extension)
     const chunkInputs: ChunkInputItem[] = [];
     let pageCount: number | null = null;
     let charCount = 0;
-    const ext = source.file_name.split('.').pop()?.toLowerCase() || '';
 
-    if (ext === 'pdf') {
+    // Detect format via magic bytes
+    let detectedFormat = '';
+    const magicHeader = buffer.slice(0, 8).toString('ascii');
+    const hexHeader = buffer.slice(0, 4).toString('hex');
+    const ext = source.file_name.includes('.') ? source.file_name.split('.').pop()?.toLowerCase() || '' : '';
+
+    if (magicHeader.startsWith('%PDF-') || hexHeader === '25504446') {
+      detectedFormat = 'pdf';
+    } else if (hexHeader === '504b0304') {
+      detectedFormat = ext === 'xlsx' || ext === 'xls' ? 'xlsx' : 'docx';
+    } else if (ext === 'pdf') {
+      detectedFormat = 'pdf';
+    } else if (ext === 'docx') {
+      detectedFormat = 'docx';
+    } else if (ext === 'xlsx' || ext === 'xls') {
+      detectedFormat = 'xlsx';
+    } else if (ext === 'csv') {
+      detectedFormat = 'csv';
+    } else {
+      detectedFormat = 'text';
+    }
+
+    if (detectedFormat === 'pdf') {
       const pdfRes = await extractPdf(new Uint8Array(arrayBuffer));
       pageCount = pdfRes.pageCount;
       charCount = pdfRes.charCount;
@@ -70,13 +91,13 @@ export async function POST(
           pageNumber: p.pageNumber,
         });
       }
-    } else if (ext === 'docx') {
+    } else if (detectedFormat === 'docx') {
       const docxRes = await extractDocx(buffer);
       charCount = docxRes.charCount;
       chunkInputs.push({
         text: docxRes.content,
       });
-    } else if (ext === 'xlsx' || ext === 'xls') {
+    } else if (detectedFormat === 'xlsx') {
       const xlsxRes = extractXlsx(buffer);
       charCount = xlsxRes.charCount;
       for (const s of xlsxRes.sheets) {
@@ -85,7 +106,7 @@ export async function POST(
           sheetName: s.sheetName,
         });
       }
-    } else if (ext === 'csv') {
+    } else if (detectedFormat === 'csv') {
       const text = buffer.toString('utf-8');
       const csvRes = extractCsv(text);
       charCount = csvRes.charCount;
@@ -144,7 +165,7 @@ export async function POST(
         notebook_id: source.notebook_id,
         user_id: user.id,
         chunk_index: c.chunkIndex,
-        content: c.content,
+        content: c.content.replace(/\0/g, '').replace(/\\u0000/g, ''),
         page_number: c.pageNumber,
         sheet_name: c.sheetName,
         heading_path: c.headingPath,
