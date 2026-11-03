@@ -144,10 +144,19 @@ export function SourceList({
 
               <div className="flex items-center gap-1.5">
                 {isProcessing && (
-                  <span className="inline-flex items-center gap-1 text-blue-600 font-medium">
-                    <Loader2 className="w-3 h-3 animate-spin" />
-                    {source.progress || 10}%
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-flex items-center gap-1 text-blue-600 font-medium">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      {source.progress || 10}%
+                    </span>
+                    <button
+                      onClick={(e) => handleRetry(source.id, e)}
+                      title="Proses ulang dokumen jika lambat atau macet"
+                      className="p-1 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded transition inline-flex items-center"
+                    >
+                      <RotateCw className="w-3 h-3" />
+                    </button>
+                  </div>
                 )}
                 {isReady && (
                   <span className="inline-flex items-center gap-1 text-green-600 font-medium">

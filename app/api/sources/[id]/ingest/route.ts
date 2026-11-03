@@ -8,7 +8,7 @@ import { extractPlainText, extractCsv } from '@/lib/ingest/extract/text';
 import { createChunks, ChunkInputItem } from '@/lib/ingest/chunk';
 import { embed } from '@/lib/ai/router';
 
-export const maxDuration = 60; // 60 seconds Vercel hobby timeout
+export const maxDuration = 120; // 120s timeout for OCR & embedding
 
 export async function POST(
   request: Request,
