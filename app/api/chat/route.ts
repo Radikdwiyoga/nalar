@@ -95,16 +95,29 @@ export async function POST(request: Request) {
   // 3. Thread resolution
   let threadId = requestedThreadId;
   if (!threadId) {
-    const { data: newThread } = await admin
+    const { data: existingThread } = await admin
       .from('chat_threads')
-      .insert({
-        notebook_id: notebookId,
-        user_id: user.id,
-        title: question.slice(0, 50),
-      })
-      .select()
+      .select('id')
+      .eq('notebook_id', notebookId)
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
       .single();
-    threadId = newThread?.id || crypto.randomUUID();
+
+    if (existingThread?.id) {
+      threadId = existingThread.id;
+    } else {
+      const { data: newThread } = await admin
+        .from('chat_threads')
+        .insert({
+          notebook_id: notebookId,
+          user_id: user.id,
+          title: question.slice(0, 50),
+        })
+        .select()
+        .single();
+      threadId = newThread?.id || crypto.randomUUID();
+    }
   }
 
   // Insert user message to thread
@@ -281,5 +294,90 @@ export async function POST(request: Request) {
       Connection: 'keep-alive',
     },
   });
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const notebookId = searchParams.get('notebookId');
+  if (!notebookId) {
+    return NextResponse.json({ error: { message: 'notebookId is required' } }, { status: 400 });
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: { message: 'Unauthorized' } }, { status: 401 });
+  }
+
+  const admin = createAdminClient();
+
+  // Find latest thread for this notebook
+  const { data: thread } = await admin
+    .from('chat_threads')
+    .select('id, title, created_at')
+    .eq('notebook_id', notebookId)
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (!thread) {
+    return NextResponse.json({ data: { threadId: null, messages: [] } });
+  }
+
+  const { data: messages, error: msgError } = await admin
+    .from('chat_messages')
+    .select('*')
+    .eq('thread_id', thread.id)
+    .order('created_at', { ascending: true });
+
+  if (msgError) {
+    return NextResponse.json({ error: { message: msgError.message } }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    data: {
+      threadId: thread.id,
+      messages: messages || [],
+    },
+  });
+}
+
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const notebookId = searchParams.get('notebookId');
+  if (!notebookId) {
+    return NextResponse.json({ error: { message: 'notebookId is required' } }, { status: 400 });
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: { message: 'Unauthorized' } }, { status: 401 });
+  }
+
+  const admin = createAdminClient();
+
+  const { data: threads } = await admin
+    .from('chat_threads')
+    .select('id')
+    .eq('notebook_id', notebookId)
+    .eq('user_id', user.id);
+
+  if (threads && threads.length > 0) {
+    const threadIds = threads.map((t) => t.id);
+    await admin.from('chat_messages').delete().in('thread_id', threadIds);
+    await admin.from('chat_threads').delete().in('id', threadIds);
+  }
+
+  return NextResponse.json({ ok: true });
 }
 

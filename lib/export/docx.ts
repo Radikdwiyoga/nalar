@@ -1,12 +1,49 @@
 import { Document, Paragraph, TextRun, HeadingLevel, Packer } from 'docx';
 
+function parseInlineRuns(text: string): TextRun[] {
+  // Regex to match **bold** or *italic*
+  const tokens = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+  const runs: TextRun[] = [];
+
+  for (const token of tokens) {
+    if (!token) continue;
+    if (token.startsWith('**') && token.endsWith('**') && token.length >= 4) {
+      runs.push(
+        new TextRun({
+          text: token.slice(2, -2),
+          bold: true,
+        })
+      );
+    } else if (token.startsWith('*') && token.endsWith('*') && token.length >= 2) {
+      runs.push(
+        new TextRun({
+          text: token.slice(1, -1),
+          italics: true,
+        })
+      );
+    } else {
+      runs.push(new TextRun({ text: token }));
+    }
+  }
+
+  return runs.length > 0 ? runs : [new TextRun({ text })];
+}
+
 export async function markdownToDocxBlob(title: string, markdown: string): Promise<Blob> {
   const paragraphs: Paragraph[] = [];
+
+  // Extract main title if first line is '# ...'
+  let docTitle = title;
+  const lines = markdown.split('\n');
+  if (lines.length > 0 && lines[0].startsWith('# ')) {
+    docTitle = lines[0].replace(/^#\s+/, '').trim();
+    lines.shift();
+  }
 
   // Document Title
   paragraphs.push(
     new Paragraph({
-      text: title,
+      text: docTitle,
       heading: HeadingLevel.TITLE,
       spacing: { after: 200 },
     })
@@ -30,8 +67,6 @@ export async function markdownToDocxBlob(title: string, markdown: string): Promi
       spacing: { after: 400 },
     })
   );
-
-  const lines = markdown.split('\n');
 
   for (let i = 0; i < lines.length; i++) {
     const rawLine = lines[i].trim();
@@ -70,12 +105,23 @@ export async function markdownToDocxBlob(title: string, markdown: string): Promi
         })
       );
     }
-    // Bullet item
+    // Numbered item: e.g. "1. " or "2. "
+    else if (/^\d+\.\s+/.test(rawLine)) {
+      const itemText = rawLine.replace(/^\d+\.\s+/, '');
+      paragraphs.push(
+        new Paragraph({
+          children: parseInlineRuns(itemText),
+          bullet: { level: 0 },
+          spacing: { after: 80 },
+        })
+      );
+    }
+    // Bullet item: "- " or "* "
     else if (rawLine.startsWith('- ') || rawLine.startsWith('* ')) {
       const bulletText = rawLine.replace(/^[-*]\s+/, '');
       paragraphs.push(
         new Paragraph({
-          text: bulletText.replace(/\*\*(.*?)\*\*/g, '$1'),
+          children: parseInlineRuns(bulletText),
           bullet: { level: 0 },
           spacing: { after: 80 },
         })
@@ -85,7 +131,7 @@ export async function markdownToDocxBlob(title: string, markdown: string): Promi
     else {
       paragraphs.push(
         new Paragraph({
-          text: rawLine.replace(/\*\*(.*?)\*\*/g, '$1'),
+          children: parseInlineRuns(rawLine),
           spacing: { after: 140 },
         })
       );
