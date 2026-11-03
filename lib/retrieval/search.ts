@@ -33,7 +33,7 @@ export async function hybridSearch({
   }
 
   try {
-    // If we have an embedding, call the RPC function hybrid_search_chunks
+    // 1. Vector Hybrid Search (pgvector + tsvector via RPC)
     if (queryEmbedding && queryEmbedding.length > 0) {
       const { data, error } = await admin.rpc('hybrid_search_chunks', {
         query_embedding: queryEmbedding,
@@ -48,7 +48,7 @@ export async function hybridSearch({
       }
     }
 
-    // Fallback: Full-text search directly if embedding failed or returned empty
+    // 2. Full-text search fallback (websearch format)
     const { data: ftsData, error: ftsError } = await admin
       .from('source_chunks')
       .select('id, source_id, content, page_number, sheet_name, heading_path, char_start, char_end')
@@ -64,18 +64,43 @@ export async function hybridSearch({
       }));
     }
 
-    // Last resort fallback: simple ILIKE search
-    const { data: fallbackData } = await admin
+    // 3. Keyword-level search (strip punctuation & conversational words, join with OR)
+    const keywords = queryText
+      .replace(/[^\w\s]/g, '')
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !['yang', 'dari', 'untuk', 'pada', 'apa', 'ini', 'itu', 'adalah', 'seperti', 'buatkan', 'tolong'].includes(w.toLowerCase()));
+
+    if (keywords.length > 0) {
+      const orQuery = keywords.slice(0, 5).join(' | ');
+      const { data: kwData } = await admin
+        .from('source_chunks')
+        .select('id, source_id, content, page_number, sheet_name, heading_path, char_start, char_end')
+        .eq('notebook_id', notebookId)
+        .in('source_id', enabledSourceIds)
+        .textSearch('tsv', orQuery, { config: 'simple' })
+        .limit(limit);
+
+      if (kwData && kwData.length > 0) {
+        return kwData.map((d: any, idx: number) => ({
+          ...d,
+          rrf_score: 1 / (80 + idx),
+        }));
+      }
+    }
+
+    // 4. Default overview / introductory chunks fallback
+    // When the query is an overview/summary request or broad greeting, supply the document's introductory chunks
+    const { data: introChunks } = await admin
       .from('source_chunks')
       .select('id, source_id, content, page_number, sheet_name, heading_path, char_start, char_end')
       .eq('notebook_id', notebookId)
       .in('source_id', enabledSourceIds)
-      .ilike('content', `%${queryText.slice(0, 50)}%`)
+      .order('chunk_index', { ascending: true })
       .limit(limit);
 
-    return (fallbackData || []).map((d: any, idx: number) => ({
+    return (introChunks || []).map((d: any, idx: number) => ({
       ...d,
-      rrf_score: 1 / (60 + idx),
+      rrf_score: 1 / (100 + idx),
     }));
   } catch (err) {
     console.error('Retrieval error:', err);

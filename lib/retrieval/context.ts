@@ -11,6 +11,12 @@ export function buildContextAndCitations(
   const citationsList: Citation[] = [];
   const blocks: string[] = [];
 
+  const docNames = Array.from(sourcesMap.values())
+    .map((s) => s.fileName)
+    .join(', ');
+
+  const header = `Dokumen Aktif dalam Notebook: ${docNames || 'Tidak ada'}\n\n`;
+
   chunks.forEach((chunk, index) => {
     const marker = `S${index + 1}`;
     const sourceInfo = sourcesMap.get(chunk.source_id);
@@ -35,7 +41,7 @@ export function buildContextAndCitations(
   });
 
   return {
-    contextText: blocks.join('\n\n'),
+    contextText: blocks.length > 0 ? `${header}${blocks.join('\n\n')}` : `${header}Belum ada potongan teks yang sesuai query.`,
     citationsList,
   };
 }

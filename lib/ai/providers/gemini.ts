@@ -94,24 +94,45 @@ export async function generateGeminiEmbeddings(
     const dim = parseInt(process.env.GEMINI_EMBED_DIM || '1536', 10);
 
     const results: number[][] = [];
-    const batchSize = 25;
+    const batchSize = 15;
 
     for (let i = 0; i < texts.length; i += batchSize) {
       const batch = texts.slice(i, i + batchSize);
-      const response = await ai.models.embedContent({
-        model,
-        contents: batch,
-        config: {
-          outputDimensionality: dim,
-        },
-      });
+      let response: any;
+      let lastErr: any;
 
-      if (response.embeddings) {
+      // Retry up to 3 times per batch
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          response = await ai.models.embedContent({
+            model,
+            contents: batch,
+            config: {
+              outputDimensionality: dim,
+            },
+          });
+          lastErr = null;
+          break;
+        } catch (err: any) {
+          lastErr = err;
+          await new Promise((res) => setTimeout(res, 500 * (attempt + 1)));
+        }
+      }
+
+      if (lastErr) {
+        throw lastErr;
+      }
+
+      if (response?.embeddings) {
         for (const emb of response.embeddings) {
           if (emb.values) {
             results.push(emb.values);
           }
         }
+      }
+
+      if (i + batchSize < texts.length) {
+        await new Promise((res) => setTimeout(res, 200));
       }
     }
 
