@@ -123,3 +123,62 @@ export async function POST(request: Request) {
   }
 }
 
+export async function GET(request: Request) {
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: { code: 'UNAUTHENTICATED', message: 'Unauthorized' } }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const notebookId = searchParams.get('notebookId');
+
+  if (!notebookId) {
+    return NextResponse.json({ error: { code: 'BAD_REQUEST', message: 'notebookId parameter wajib diisi' } }, { status: 400 });
+  }
+
+  const admin = createAdminClient();
+  const { data: artifacts, error } = await admin
+    .from('artifacts')
+    .select('*')
+    .eq('notebook_id', notebookId)
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    return NextResponse.json({ error: { code: 'DB_ERROR', message: error.message } }, { status: 500 });
+  }
+
+  return NextResponse.json({ data: artifacts || [] });
+}
+
+export async function DELETE(request: Request) {
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return NextResponse.json({ error: { code: 'UNAUTHENTICATED', message: 'Unauthorized' } }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return NextResponse.json({ error: { code: 'BAD_REQUEST', message: 'id parameter wajib diisi' } }, { status: 400 });
+  }
+
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from('artifacts')
+    .delete()
+    .eq('id', id)
+    .eq('user_id', user.id);
+
+  if (error) {
+    return NextResponse.json({ error: { code: 'DB_ERROR', message: error.message } }, { status: 500 });
+  }
+
+  return NextResponse.json({ success: true });
+}
+

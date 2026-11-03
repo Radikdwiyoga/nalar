@@ -10,6 +10,7 @@ import { UploadDropzone } from '@/components/sources/upload-dropzone';
 import { SourceList } from '@/components/sources/source-list';
 import { ChatPanel } from '@/components/chat/chat-panel';
 import { SourceViewer } from '@/components/sources/source-viewer';
+import { ArtifactStudio } from '@/components/artifacts/artifact-studio';
 
 export default function NotebookDetailPage({
   params,
@@ -22,8 +23,8 @@ export default function NotebookDetailPage({
   const [sources, setSources] = useState<Source[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Mobile active tab: 'chat' | 'sources'
-  const [mobileTab, setMobileTab] = useState<'chat' | 'sources'>('chat');
+  // Active view: 'chat' | 'studio' | 'sources' (on mobile)
+  const [activeView, setActiveView] = useState<'chat' | 'studio' | 'sources'>('chat');
 
   // Source viewer state
   const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
@@ -82,7 +83,7 @@ export default function NotebookDetailPage({
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div className="flex items-center gap-2 min-w-0">
-            <h1 className="font-bold text-xs sm:text-sm tracking-tight truncate max-w-[150px] sm:max-w-xs md:max-w-md">
+            <h1 className="font-bold text-xs sm:text-sm tracking-tight truncate max-w-[140px] sm:max-w-xs md:max-w-md">
               {notebook.title}
             </h1>
             <span className="hidden sm:inline-flex text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium shrink-0">
@@ -91,12 +92,38 @@ export default function NotebookDetailPage({
           </div>
         </div>
 
-        {/* Mobile Tab Switcher (Chat vs Sumber) */}
+        {/* Desktop View Switcher (Chat vs Studio) */}
+        <div className="hidden md:flex items-center bg-muted/60 p-1 rounded-lg border text-xs shrink-0">
+          <button
+            onClick={() => setActiveView('chat')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+              activeView === 'chat'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-primary" />
+            <span>Chat AI</span>
+          </button>
+          <button
+            onClick={() => setActiveView('studio')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-medium transition-all ${
+              activeView === 'studio'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span>Studio & Dokumen</span>
+          </button>
+        </div>
+
+        {/* Mobile Tab Switcher (Chat vs Studio vs Sumber) */}
         <div className="flex md:hidden items-center bg-muted/60 p-1 rounded-lg border text-xs shrink-0">
           <button
-            onClick={() => setMobileTab('chat')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-all ${
-              mobileTab === 'chat'
+            onClick={() => setActiveView('chat')}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-medium transition-all ${
+              activeView === 'chat'
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground'
             }`}
@@ -105,15 +132,26 @@ export default function NotebookDetailPage({
             <span>Chat</span>
           </button>
           <button
-            onClick={() => setMobileTab('sources')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition-all ${
-              mobileTab === 'sources'
+            onClick={() => setActiveView('studio')}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-medium transition-all ${
+              activeView === 'studio'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span>Studio</span>
+          </button>
+          <button
+            onClick={() => setActiveView('sources')}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-medium transition-all ${
+              activeView === 'sources'
                 ? 'bg-background text-foreground shadow-sm'
                 : 'text-muted-foreground'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>Sumber ({sources.length})</span>
+            <span>Sumber</span>
           </button>
         </div>
       </header>
@@ -123,7 +161,7 @@ export default function NotebookDetailPage({
         {/* Sources Panel */}
         <div
           className={`${
-            mobileTab === 'sources' ? 'flex w-full' : 'hidden'
+            activeView === 'sources' ? 'flex w-full' : 'hidden'
           } md:flex md:w-72 lg:w-80 border-r bg-muted/10 flex-col h-full shrink-0 overflow-hidden`}
         >
           <div className="p-3.5 border-b flex items-center justify-between shrink-0">
@@ -154,20 +192,29 @@ export default function NotebookDetailPage({
           </div>
         </div>
 
-        {/* Chat Panel */}
-        <div
-          className={`${
-            mobileTab === 'chat' ? 'flex' : 'hidden'
-          } md:flex flex-1 flex-col h-full min-w-0 overflow-hidden`}
-        >
-          <ChatPanel
-            notebookId={notebookId}
-            readySourceCount={readySources.length}
-            onCitationClick={(cit) => {
-              setActiveCitation(cit);
-              setSelectedSourceId(cit.sourceId);
-            }}
-          />
+        {/* Center Workspace (Chat or Studio) */}
+        <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+          {activeView === 'studio' ? (
+            <ArtifactStudio
+              notebookId={notebookId}
+              readySourceCount={readySources.length}
+            />
+          ) : (
+            <div
+              className={`${
+                activeView === 'chat' ? 'flex' : 'hidden md:flex'
+              } flex-1 flex-col h-full min-w-0 overflow-hidden`}
+            >
+              <ChatPanel
+                notebookId={notebookId}
+                readySourceCount={readySources.length}
+                onCitationClick={(cit) => {
+                  setActiveCitation(cit);
+                  setSelectedSourceId(cit.sourceId);
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Source Viewer Drawer (Responsive Slide-over) */}
