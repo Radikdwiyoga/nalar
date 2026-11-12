@@ -102,24 +102,24 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
       )}
 
       <div
-        className={`max-w-[92%] sm:max-w-[85%] rounded-2xl p-3 sm:p-4 space-y-2.5 ${
+        className={`max-w-[95%] sm:max-w-[88%] space-y-2.5 ${
           isUser
-            ? 'bg-primary text-primary-foreground rounded-tr-sm'
-            : 'bg-card border rounded-tl-sm shadow-sm'
+            ? 'bg-nalar-accent text-white rounded-2xl rounded-tr-xs p-3.5 sm:p-4 shadow-xs'
+            : 'bg-white border border-[#E5E0D5] rounded-xl rounded-tl-xs p-5 sm:p-6 shadow-xs'
         }`}
       >
         {/* Prominent Word Download Card if the answer is a structured document / summary */}
         {isDocumentSummary && (
-          <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 transition mb-3">
+          <div className="flex items-center justify-between p-3 rounded-xl border border-[#E5E0D5] bg-[#FAF8F5] hover:bg-[#F3F0EA] transition mb-3">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[#F3EAE2] text-[#C25127] flex items-center justify-center shrink-0">
                 <FileText className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <p className="font-semibold text-xs text-foreground truncate">
+                <p className="font-semibold text-xs text-nalar-text truncate">
                   Dokumen Word (.docx) Tersedia
                 </p>
-                <p className="text-[11px] text-muted-foreground truncate">
+                <p className="text-[11px] text-nalar-muted truncate">
                   {getDerivedTitle()}.docx
                 </p>
               </div>
@@ -127,7 +127,7 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
             <button
               onClick={handleDownloadDocx}
               disabled={downloadingDocx}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 transition shrink-0 shadow-xs ml-2 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-nalar-accent text-white text-xs font-medium hover:bg-nalar-accentHover transition shrink-0 shadow-xs ml-2 cursor-pointer"
             >
               {downloadingDocx ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -141,12 +141,27 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
 
         <div
           className={`prose dark:prose-invert max-w-none text-sm break-words leading-relaxed ${
-            isUser ? 'text-primary-foreground' : 'text-foreground'
+            isUser ? 'text-white' : 'text-nalar-text'
           }`}
         >
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
+              h1: ({ children }) => (
+                <h1 className="font-serif font-bold text-xl sm:text-2xl text-nalar-text mt-4 mb-2 tracking-tight">
+                  {children}
+                </h1>
+              ),
+              h2: ({ children }) => (
+                <h2 className="font-serif font-bold text-lg sm:text-xl text-nalar-text mt-3.5 mb-1.5 tracking-tight border-b border-[#E5E0D5] pb-1">
+                  {children}
+                </h2>
+              ),
+              h3: ({ children }) => (
+                <h3 className="font-serif font-semibold text-base sm:text-lg text-nalar-text mt-2.5 mb-1">
+                  {children}
+                </h3>
+              ),
               a: ({ href, children }) => {
                 if (href?.startsWith('#cite-')) {
                   const marker = href.replace('#cite-', '');
@@ -158,7 +173,7 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
                         e.preventDefault();
                         if (cit) onCitationClick?.(cit);
                       }}
-                      className="inline-flex items-center gap-0.5 px-1.5 py-0.2 mx-0.5 rounded-md bg-primary/10 hover:bg-primary/20 text-primary text-[11px] font-semibold border border-primary/30 transition-all cursor-pointer align-baseline no-underline shadow-2xs"
+                      className="inline-flex items-center gap-0.5 px-1.5 py-0.2 mx-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] hover:bg-[#C25127] hover:text-white text-[11px] font-semibold transition-all cursor-pointer align-baseline no-underline shadow-2xs"
                       title={
                         cit
                           ? `Buka dokumen: ${cit.sourceName || marker}${cit.page ? ` (Hal. ${cit.page})` : ''}`
@@ -175,7 +190,7 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary underline hover:text-primary/80"
+                    className="text-nalar-accent underline hover:text-nalar-accentHover"
                   >
                     {children}
                   </a>

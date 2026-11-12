@@ -13,15 +13,15 @@ export function CitationChip({ citation, onClick }: CitationChipProps) {
     <button
       type="button"
       onClick={() => onClick?.(citation)}
-      className="inline-flex items-center gap-1.5 px-2 py-0.5 my-0.5 rounded-md bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium border border-primary/20 transition-all cursor-pointer"
+      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 my-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] hover:bg-[#C25127] hover:text-white text-xs font-semibold transition-all cursor-pointer shadow-2xs"
       title={`Buka kutipan: ${citation.sourceName || 'Dokumen'} ${
         citation.page ? `(Hal. ${citation.page})` : ''
       }`}
     >
       <BookOpen className="w-3 h-3 shrink-0" />
       <span>
-        [{citation.marker}] {citation.sourceName ? citation.sourceName.slice(0, 15) : 'Sumber'}
-        {citation.page ? ` : h.${citation.page}` : ''}
+        [{citation.marker}] {citation.sourceName ? citation.sourceName.slice(0, 16) : 'Sumber'}
+        {citation.page ? ` · h.${citation.page}` : ''}
       </span>
     </button>
   );

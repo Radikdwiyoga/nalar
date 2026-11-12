@@ -10,7 +10,23 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-sans)', 'Plus Jakarta Sans', 'Inter', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Newsreader', 'Lora', 'Georgia', 'serif'],
+      },
       colors: {
+        nalar: {
+          bg: '#FAF8F5',        // Warm Alabaster / Paper
+          surface: '#F3F0EA',   // Soft Warm Gray / Cream
+          card: '#FFFFFF',      // Pure White Card
+          border: '#E5E0D5',    // Warm Stone Border
+          text: '#1C1B18',      // Deep Charcoal
+          muted: '#6E6A61',     // Warm Muted Gray
+          accent: '#C25127',    // Deep Terracotta / Burnt Amber
+          accentHover: '#A6421D',
+          citationBg: '#F3EAE2',
+          citationBorder: '#DFC9B8',
+        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {

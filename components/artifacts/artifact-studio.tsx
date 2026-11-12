@@ -182,13 +182,13 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
       {/* Studio Header */}
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-[#F3EAE2] text-[#C25127] flex items-center justify-center">
             <Sparkles className="w-4 h-4" />
           </div>
-          <h2 className="text-xl font-bold tracking-tight">Studio & Dokumen Sintesis</h2>
+          <h2 className="text-xl sm:text-2xl font-serif font-bold tracking-tight text-nalar-text">Studio & Dokumen Sintesis</h2>
         </div>
-        <p className="text-sm text-muted-foreground">
-          Hasilkan catatan komprehensif, ringkasan, atau panduan belajar dari materi dokumen aktif Anda dengan 1-klik.
+        <p className="text-xs sm:text-sm text-nalar-muted">
+          Hasilkan catatan komprehensif, ringkasan eksekutif, atau panduan belajar dari materi dokumen aktif Anda dengan 1-klik.
         </p>
       </div>
 
@@ -213,39 +213,41 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
             return (
               <div
                 key={opt.kind}
-                className="group relative flex flex-col justify-between p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-md transition-all space-y-3"
+                onClick={() => {
+                  if (!isAnyGenerating && readySourceCount > 0) {
+                    handleGenerate(opt.kind);
+                  }
+                }}
+                className={`group relative flex flex-col justify-between p-4.5 rounded-xl border border-[#E5E0D5] bg-white hover:border-[#C25127] hover:shadow-sm transition-all cursor-pointer ${
+                  isAnyGenerating || readySourceCount === 0 ? 'opacity-60 cursor-not-allowed' : ''
+                }`}
               >
-                <div className="space-y-2">
-                  <div className={`w-9 h-9 rounded-lg border flex items-center justify-center shrink-0 ${opt.color}`}>
-                    <Icon className="w-5 h-5" />
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className={`w-9 h-9 rounded-lg border flex items-center justify-center shrink-0 ${opt.color}`}>
+                      <Icon className="w-4.5 h-4.5" />
+                    </div>
+                    {isGeneratingThis && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#C25127] animate-pulse">
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        Menyusun...
+                      </span>
+                    )}
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sm group-hover:text-primary transition-colors">
+                    <h4 className="font-serif font-bold text-sm text-nalar-text group-hover:text-[#C25127] transition-colors">
                       {opt.title}
                     </h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed mt-1">
+                    <p className="text-xs text-nalar-muted leading-relaxed mt-1">
                       {opt.desc}
                     </p>
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleGenerate(opt.kind)}
-                  disabled={isAnyGenerating || readySourceCount === 0}
-                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 transition-all shadow-sm"
-                >
-                  {isGeneratingThis ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span>Menyusun...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Buat Sekarang</span>
-                    </>
-                  )}
-                </button>
+                <div className="pt-3 mt-2 border-t border-[#E5E0D5]/60 flex items-center justify-between text-xs font-medium text-nalar-muted group-hover:text-[#C25127] transition-colors">
+                  <span>Buat dengan 1-Klik</span>
+                  <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+                </div>
               </div>
             );
           })}

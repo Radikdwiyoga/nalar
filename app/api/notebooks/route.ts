@@ -19,7 +19,8 @@ export async function GET() {
     .from('notebooks')
     .select(`
       *,
-      sources:sources(count)
+      sources:sources(id, file_name),
+      artifacts:artifacts(count)
     `)
     .eq('user_id', user.id)
     .order('updated_at', { ascending: false });
@@ -30,7 +31,9 @@ export async function GET() {
 
   const formattedNotebooks = notebooks.map((nb: any) => ({
     ...nb,
-    sources_count: nb.sources?.[0]?.count || 0,
+    sources_count: nb.sources?.length || 0,
+    preview_sources: nb.sources?.slice(0, 2).map((s: any) => s.file_name) || [],
+    artifacts_count: nb.artifacts?.[0]?.count || 0,
   }));
 
   return NextResponse.json({ data: formattedNotebooks });

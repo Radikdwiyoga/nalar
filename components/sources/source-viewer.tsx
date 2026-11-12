@@ -140,21 +140,21 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
 
       {/* Split Viewer Container */}
       <div
-        className={`fixed inset-y-0 right-0 z-50 md:static md:z-auto border-l bg-card flex flex-col h-full shrink-0 shadow-2xl md:shadow-none transition-all duration-300 ease-in-out ${
+        className={`fixed inset-y-0 right-0 z-50 md:static md:z-auto border-l border-[#E5E0D5] bg-[#F3F0EA] flex flex-col h-full shrink-0 shadow-2xl md:shadow-none transition-all duration-300 ease-in-out ${
           isExpanded
             ? 'w-full md:w-[65%] lg:w-[70%] xl:w-[75%]'
             : 'w-full max-w-lg md:w-[48%] lg:w-[50%] xl:w-[50%]'
         }`}
       >
         {/* Header Bar */}
-        <div className="h-14 px-3 sm:px-4 border-b flex items-center justify-between gap-2 shrink-0 bg-muted/20 backdrop-blur-xs">
+        <div className="h-14 px-3 sm:px-4 border-b border-[#E5E0D5] flex items-center justify-between gap-2 shrink-0 bg-[#FAF8F5]/80 backdrop-blur-xs">
           <div className="flex items-center gap-2 min-w-0 flex-1">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-[#F3EAE2] text-[#C25127] flex items-center justify-center shrink-0">
               <FileText className="w-4 h-4" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
-                <span className="font-semibold text-xs sm:text-sm text-foreground truncate block">
+                <span className="font-semibold text-xs sm:text-sm text-nalar-text truncate block font-serif">
                   {sourceData?.fileName || 'Memuat Dokumen...'}
                 </span>
                 {isPdf && (
@@ -163,9 +163,9 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-2 text-[11px] text-muted-foreground truncate">
+              <div className="flex items-center gap-2 text-[11px] text-nalar-muted truncate">
                 {activeCitation && (
-                  <span className="inline-flex items-center gap-1 text-primary font-semibold">
+                  <span className="inline-flex items-center gap-1 text-[#C25127] font-semibold">
                     <Bookmark className="w-3 h-3" />
                     Sitasi [{activeCitation.marker}]
                     {activeCitation.page ? ` · Hal. ${activeCitation.page}` : ''}
@@ -371,25 +371,25 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
                           <div
                             key={chunk.id}
                             ref={isCited ? activeChunkRef : null}
-                            className={`p-3.5 rounded-xl border text-xs leading-relaxed transition-all relative ${
+                            className={`p-3.5 rounded-xl text-xs leading-relaxed transition-all relative ${
                               isCited
-                                ? 'border-amber-500 bg-amber-500/10 ring-2 ring-amber-500/30 shadow-md'
-                                : 'bg-card border-border/70 hover:border-primary/40'
+                                ? 'bg-[#FEF3C7] border-l-4 border-[#C25127] border-y border-r border-[#E5E0D5] shadow-xs'
+                                : 'bg-white border border-[#E5E0D5] hover:border-[#C25127]/40'
                             }`}
                           >
                             {/* Chunk Metadata Tag Header */}
-                            <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/50 text-[11px] text-muted-foreground">
+                            <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#E5E0D5]/60 text-[11px] text-nalar-muted">
                               <div className="flex items-center gap-1.5 font-medium">
-                                <span className="px-1.5 py-0.5 rounded bg-muted font-mono text-[10px]">
+                                <span className="px-1.5 py-0.5 rounded bg-[#F3F0EA] font-mono text-[10px] text-nalar-text">
                                   Chunk #{chunk.chunk_index + 1}
                                 </span>
                                 {chunk.page_number && (
-                                  <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold">
+                                  <span className="px-1.5 py-0.5 rounded bg-[#F3EAE2] text-[#A6421D] font-semibold border border-[#DFC9B8]/60">
                                     Halaman {chunk.page_number}
                                   </span>
                                 )}
                                 {chunk.sheet_name && (
-                                  <span className="px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 font-semibold">
+                                  <span className="px-1.5 py-0.5 rounded bg-[#F3F0EA] text-nalar-text font-semibold">
                                     Sheet: {chunk.sheet_name}
                                   </span>
                                 )}
@@ -397,7 +397,7 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
 
                               <div className="flex items-center gap-1">
                                 {isCited && (
-                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-amber-950">
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C25127] text-white">
                                     <Sparkles className="w-2.5 h-2.5" />
                                     Kutipan Aktif [{activeCitation?.marker}]
                                   </span>
@@ -405,10 +405,10 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
                                 <button
                                   onClick={() => handleCopyChunk(chunk.id, chunk.content)}
                                   title="Salin teks bagian ini"
-                                  className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition cursor-pointer"
+                                  className="p-1 rounded hover:bg-[#F3F0EA] text-nalar-muted hover:text-nalar-text transition cursor-pointer"
                                 >
                                   {copiedChunkId === chunk.id ? (
-                                    <Check className="w-3 h-3 text-green-600" />
+                                    <Check className="w-3 h-3 text-emerald-600" />
                                   ) : (
                                     <Copy className="w-3 h-3" />
                                   )}

@@ -73,22 +73,22 @@ export default function NotebookDetailPage({
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-background">
+    <div className="flex flex-col h-screen overflow-hidden bg-nalar-bg text-nalar-text">
       {/* Top Header */}
-      <header className="h-14 border-b glass px-3 sm:px-4 flex items-center justify-between shrink-0 z-10">
+      <header className="h-14 border-b border-[#E5E0D5] bg-[#FAF8F5]/90 backdrop-blur-md px-3 sm:px-4 flex items-center justify-between shrink-0 z-10">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Link
             href="/notebooks"
-            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition shrink-0"
+            className="p-1.5 rounded-lg text-nalar-muted hover:text-nalar-text hover:bg-[#F3F0EA] transition shrink-0"
             title="Kembali ke Daftar Notebook"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div className="flex items-center gap-2 min-w-0">
-            <h1 className="font-bold text-xs sm:text-sm tracking-tight truncate max-w-[120px] sm:max-w-xs md:max-w-md">
+            <h1 className="font-serif font-bold text-xs sm:text-sm tracking-tight truncate max-w-[140px] sm:max-w-xs md:max-w-md text-nalar-text">
               {notebook.title}
             </h1>
-            <span className="hidden sm:inline-flex text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium shrink-0">
+            <span className="hidden sm:inline-flex text-[11px] px-2 py-0.5 rounded-full bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8]/70 font-medium shrink-0">
               {readySources.length} sumber aktif
             </span>
           </div>
@@ -97,27 +97,27 @@ export default function NotebookDetailPage({
         {/* Action Controls & View Switcher */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Desktop View Switcher (Chat vs Studio) */}
-          <div className="hidden md:flex items-center bg-muted/60 p-1 rounded-xl border text-xs">
+          <div className="hidden md:flex items-center bg-[#F3F0EA] p-1 rounded-xl border border-[#E5E0D5] text-xs">
             <button
               onClick={() => setActiveView('chat')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
                 activeView === 'chat'
-                  ? 'bg-background text-foreground shadow-xs font-semibold'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-white text-nalar-text shadow-2xs font-semibold'
+                  : 'text-nalar-muted hover:text-nalar-text'
               }`}
             >
-              <MessageSquare className="w-3.5 h-3.5 text-primary" />
+              <MessageSquare className="w-3.5 h-3.5 text-nalar-accent" />
               <span>Chat AI</span>
             </button>
             <button
               onClick={() => setActiveView('studio')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
                 activeView === 'studio'
-                  ? 'bg-background text-foreground shadow-xs font-semibold'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-white text-nalar-text shadow-2xs font-semibold'
+                  : 'text-nalar-muted hover:text-nalar-text'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>Studio Dokumen</span>
             </button>
           </div>
@@ -125,46 +125,46 @@ export default function NotebookDetailPage({
           {/* Share Button */}
           <button
             onClick={() => setShareModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border bg-background hover:bg-muted text-xs font-medium text-foreground transition-colors shadow-2xs cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#E5E0D5] bg-white hover:bg-[#F3F0EA] text-xs font-medium text-nalar-text transition-colors shadow-2xs cursor-pointer"
             title="Bagikan Notebook"
           >
-            <Share2 className="w-3.5 h-3.5 text-primary" />
+            <Share2 className="w-3.5 h-3.5 text-nalar-accent" />
             <span className="hidden sm:inline">Bagikan</span>
           </button>
 
           {/* Mobile Tab Switcher (Chat vs Studio vs Sumber) */}
-          <div className="flex md:hidden items-center bg-muted/80 p-0.5 rounded-xl border text-[11px]">
+          <div className="flex md:hidden items-center bg-[#F3F0EA] p-0.5 rounded-xl border border-[#E5E0D5] text-[11px]">
             <button
               onClick={() => setActiveView('chat')}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-medium transition-all ${
                 activeView === 'chat'
-                  ? 'bg-background text-foreground shadow-xs font-bold'
-                  : 'text-muted-foreground'
+                  ? 'bg-white text-nalar-text shadow-2xs font-bold'
+                  : 'text-nalar-muted'
               }`}
             >
-              <MessageSquare className="w-3.5 h-3.5 text-primary" />
+              <MessageSquare className="w-3.5 h-3.5 text-nalar-accent" />
               <span>Chat</span>
             </button>
             <button
               onClick={() => setActiveView('studio')}
               className={`flex items-center gap-1 px-2 py-1 rounded-lg font-medium transition-all ${
                 activeView === 'studio'
-                  ? 'bg-background text-foreground shadow-xs font-bold'
-                  : 'text-muted-foreground'
+                  ? 'bg-white text-nalar-text shadow-2xs font-bold'
+                  : 'text-nalar-muted'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>Studio</span>
             </button>
             <button
               onClick={() => setActiveView('sources')}
               className={`flex items-center gap-1 px-2 py-1 rounded-lg font-medium transition-all ${
                 activeView === 'sources'
-                  ? 'bg-background text-foreground shadow-xs font-bold'
-                  : 'text-muted-foreground'
+                  ? 'bg-white text-nalar-text shadow-2xs font-bold'
+                  : 'text-nalar-muted'
               }`}
             >
-              <Layers className="w-3.5 h-3.5 text-blue-500" />
+              <Layers className="w-3.5 h-3.5 text-nalar-accent" />
               <span>Sumber</span>
             </button>
           </div>
@@ -177,19 +177,19 @@ export default function NotebookDetailPage({
         <div
           className={`${
             activeView === 'sources' ? 'flex w-full' : 'hidden'
-          } md:flex md:w-72 lg:w-80 border-r bg-muted/10 flex-col h-full shrink-0 overflow-hidden`}
+          } md:flex md:w-72 lg:w-80 border-r border-[#E5E0D5] bg-[#F3F0EA] flex-col h-full shrink-0 overflow-hidden`}
         >
-          <div className="p-3.5 border-b flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-              <Layers className="w-4 h-4 text-primary" />
+          <div className="p-3.5 border-b border-[#E5E0D5] flex items-center justify-between shrink-0 bg-[#F3F0EA]">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-nalar-muted">
+              <Layers className="w-4 h-4 text-nalar-accent" />
               <span>Sumber Dokumen</span>
             </div>
-            <span className="text-xs font-semibold text-muted-foreground">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white border border-[#E5E0D5] text-nalar-text">
               {sources.length}
             </span>
           </div>
 
-          <div className="p-3 sm:p-4 flex-1 overflow-y-auto space-y-4">
+          <div className="p-3 sm:p-3.5 flex-1 overflow-y-auto space-y-3.5">
             <UploadDropzone
               notebookId={notebookId}
               onUploaded={fetchNotebookData}
@@ -199,8 +199,12 @@ export default function NotebookDetailPage({
               sources={sources}
               onRefresh={fetchNotebookData}
               onSelectSource={(s) => {
-                setSelectedSourceId(s.id);
-                setActiveCitation(null);
+                if (selectedSourceId === s.id && !activeCitation) {
+                  setSelectedSourceId(null);
+                } else {
+                  setSelectedSourceId(s.id);
+                  setActiveCitation(null);
+                }
               }}
               selectedSourceId={selectedSourceId}
             />

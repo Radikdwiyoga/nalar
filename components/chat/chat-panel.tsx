@@ -326,8 +326,45 @@ export function ChatPanel({
         <div ref={scrollEndRef} />
       </div>
 
-      {/* Input area */}
-      <div className="p-2.5 sm:p-4 border-t bg-card/80 backdrop-blur sticky bottom-0 z-10">
+      {/* Input area & Quick Prompts */}
+      <div className="p-3 sm:p-4 border-t border-[#E5E0D5] bg-[#FAF8F5]/90 backdrop-blur-md sticky bottom-0 z-10 space-y-2">
+        {/* Quick Prompt Chips */}
+        {readySourceCount > 0 && !isStreaming && (
+          <div className="max-w-4xl mx-auto flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px] scrollbar-none">
+            <span className="text-nalar-muted font-medium shrink-0 flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-nalar-accent" />
+              Saran Cepat:
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setInput('Rangkum seluruh dokumen ini ke format Word (.docx) secara detail dan terstruktur.');
+              }}
+              className="px-2.5 py-1 rounded-full border border-[#E5E0D5] bg-white hover:border-[#C25127] hover:text-[#C25127] text-nalar-text transition whitespace-nowrap shrink-0 cursor-pointer shadow-2xs"
+            >
+              📄 Rangkum ke Word (.docx)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setInput('Apa saja temuan utama, poin penting, dan ringkasan eksekutifnya?');
+              }}
+              className="px-2.5 py-1 rounded-full border border-[#E5E0D5] bg-white hover:border-[#C25127] hover:text-[#C25127] text-nalar-text transition whitespace-nowrap shrink-0 cursor-pointer shadow-2xs"
+            >
+              💡 Temuan Utama Dokumen
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setInput('Jelaskan batasan risiko, klausul penalti, dan jangka waktu pelaksanaan.');
+              }}
+              className="px-2.5 py-1 rounded-full border border-[#E5E0D5] bg-white hover:border-[#C25127] hover:text-[#C25127] text-nalar-text transition whitespace-nowrap shrink-0 cursor-pointer shadow-2xs"
+            >
+              ⚠️ Risiko, Penalti & Batas Waktu
+            </button>
+          </div>
+        )}
+
         <form onSubmit={handleSend} className="max-w-4xl mx-auto flex gap-2">
           <textarea
             rows={1}
@@ -342,16 +379,16 @@ export function ChatPanel({
             placeholder={
               readySourceCount === 0
                 ? 'Unggah sumber dokumen terlebih dahulu...'
-                : 'Tanyakan sesuatu atau minta rangkum ke Word... (Enter untuk kirim)'
+                : 'Tanyakan sesuatu atau minta analisis dokumen... (Enter untuk kirim)'
             }
-            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl border bg-background text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none min-h-[44px] sm:min-h-[48px] max-h-32"
+            className="flex-1 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-[#E5E0D5] bg-white text-xs sm:text-sm text-nalar-text placeholder:text-nalar-muted focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent resize-none min-h-[44px] sm:min-h-[48px] max-h-32 shadow-2xs"
           />
 
           {isStreaming ? (
             <button
               type="button"
               onClick={handleStop}
-              className="px-3.5 sm:px-4 bg-destructive text-destructive-foreground rounded-xl flex items-center justify-center hover:bg-destructive/90 transition shadow-sm shrink-0 cursor-pointer"
+              className="px-3.5 sm:px-4 bg-destructive text-destructive-foreground rounded-xl flex items-center justify-center hover:bg-destructive/90 transition shadow-xs shrink-0 cursor-pointer"
               title="Hentikan Jawaban"
             >
               <Square className="w-4 h-4" />
@@ -360,7 +397,7 @@ export function ChatPanel({
             <button
               type="submit"
               disabled={!input.trim()}
-              className="px-3.5 sm:px-4 bg-primary text-primary-foreground rounded-xl flex items-center justify-center hover:bg-primary/90 disabled:opacity-50 transition shadow-sm shrink-0 cursor-pointer"
+              className="px-3.5 sm:px-4 bg-nalar-accent text-white rounded-xl flex items-center justify-center hover:bg-nalar-accentHover disabled:opacity-50 transition shadow-xs shrink-0 cursor-pointer"
               title="Kirim Pertanyaan"
             >
               <Send className="w-4 h-4" />

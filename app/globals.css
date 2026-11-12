@@ -4,48 +4,49 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
+    /* Editorial Warmth Palette (Claude / Notion Style) */
+    --background: 38 29% 97%;       /* #FAF8F5 Warm Alabaster */
+    --foreground: 45 8% 10%;        /* #1C1B18 Deep Charcoal */
+    --card: 0 0% 100%;              /* #FFFFFF Pure White */
+    --card-foreground: 45 8% 10%;   /* #1C1B18 */
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 84.2% 60.2%;
+    --popover-foreground: 45 8% 10%;
+    --primary: 16 67% 46%;          /* #C25127 Deep Terracotta */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 21% 94%;        /* #F3F0EA Soft Warm Surface */
+    --secondary-foreground: 45 8% 10%;
+    --muted: 40 21% 94%;            /* #F3F0EA */
+    --muted-foreground: 41 7% 41%;  /* #6E6A61 Warm Muted Gray */
+    --accent: 40 21% 94%;
+    --accent-foreground: 16 67% 46%;
+    --destructive: 0 74% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.625rem;
+    --border: 39 20% 87%;           /* #E5E0D5 Warm Stone Border */
+    --input: 39 20% 87%;
+    --ring: 16 67% 46%;
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 30 6% 10%;
+    --foreground: 36 20% 95%;
+    --card: 30 6% 12%;
+    --card-foreground: 36 20% 95%;
+    --popover: 30 6% 12%;
+    --popover-foreground: 36 20% 95%;
+    --primary: 16 67% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 6% 16%;
+    --secondary-foreground: 36 20% 95%;
+    --muted: 30 6% 16%;
+    --muted-foreground: 36 10% 65%;
+    --accent: 30 6% 16%;
+    --accent-foreground: 16 67% 55%;
+    --destructive: 0 62.8% 40%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 217.2 91.2% 59.8%;
+    --border: 30 6% 20%;
+    --input: 30 6% 20%;
+    --ring: 16 67% 55%;
   }
 }
 
@@ -59,31 +60,29 @@
   }
 }
 
-/* Glassmorphism & Modern UI utilities */
+/* Editorial Glass & Surface utilities */
 .glass {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(250, 248, 245, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(229, 224, 213, 0.8);
 }
 
 .dark .glass {
-  background: rgba(18, 18, 24, 0.75);
+  background: rgba(24, 23, 21, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  background: #FFFFFF;
+  border: 1px solid #E5E0D5;
+  box-shadow: 0 4px 20px -2px rgba(28, 27, 24, 0.04);
 }
 
 .dark .glass-card {
-  background: rgba(24, 24, 32, 0.65);
+  background: rgba(30, 28, 25, 0.85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -91,7 +90,7 @@
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 50%, #7c3aed 100%);
+  background: linear-gradient(135deg, #C25127 0%, #D97736 50%, #8C3210 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

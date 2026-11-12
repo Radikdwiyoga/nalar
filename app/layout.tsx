@@ -1,5 +1,19 @@
 import type { Metadata } from 'next';
+import { Plus_Jakarta_Sans, Newsreader } from 'next/font/google';
 import './globals.css';
+
+const sans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const serif = Newsreader({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  style: ['normal', 'italic'],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Nalar — AI Notebook Pribadi',
@@ -17,8 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
-      <body className="min-h-screen bg-background font-sans antialiased text-foreground">
+    <html lang="id" className={`${sans.variable} ${serif.variable}`}>
+      <body className="min-h-screen bg-nalar-bg font-sans antialiased text-nalar-text selection:bg-nalar-accent/15 selection:text-nalar-accent">
         {children}
       </body>
     </html>
