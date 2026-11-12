@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { X, Copy, Check, Download, Trash2, Sparkles, Calendar, Cpu, FileText, Loader2 } from 'lucide-react';
 import { Artifact, ArtifactKind } from '@/lib/types';
+import { AudioPodcastPlayer } from './audio-podcast-player';
 
 interface ArtifactViewerModalProps {
   artifact: Artifact | null;
@@ -18,6 +19,8 @@ const KIND_LABELS: Record<ArtifactKind, { label: string; color: string }> = {
   study_guide: { label: 'Panduan Belajar', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' },
   timeline: { label: 'Kronologi / Linimasa', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' },
   briefing: { label: 'Dokumen Briefing', color: 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300' },
+  comparison: { label: 'Matriks Komparasi', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' },
+  audio_overview: { label: 'AI Podcast Diskusi', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300' },
 };
 
 export function ArtifactViewerModal({
@@ -197,11 +200,24 @@ export function ArtifactViewerModal({
           </div>
         </div>
 
-        {/* Modal Markdown Content */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-7 text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {artifact.content_md}
-          </ReactMarkdown>
+        {/* Modal Markdown Content & Optional Audio Player */}
+        <div className="flex-1 overflow-y-auto p-5 sm:p-7 text-sm leading-relaxed space-y-5">
+          {/* If audio overview podcast, show the interactive audio player on top */}
+          {(artifact.kind === 'audio_overview' ||
+            artifact.title.toLowerCase().includes('podcast') ||
+            artifact.content_md.includes('**Maya:**') ||
+            artifact.content_md.includes('**Budi:**')) && (
+            <AudioPodcastPlayer
+              contentMd={artifact.content_md}
+              title={artifact.title}
+            />
+          )}
+
+          <div className="prose prose-sm dark:prose-invert max-w-none">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {artifact.content_md}
+            </ReactMarkdown>
+          </div>
         </div>
 
         {/* Modal Footer */}

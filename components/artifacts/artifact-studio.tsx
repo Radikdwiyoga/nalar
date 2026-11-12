@@ -14,13 +14,17 @@ import {
   ExternalLink,
   AlertCircle,
   FileCode2,
+  Scale,
+  Radio,
 } from 'lucide-react';
-import { Artifact, ArtifactKind } from '@/lib/types';
+import { Artifact, ArtifactKind, Source } from '@/lib/types';
 import { ArtifactViewerModal } from './artifact-viewer-modal';
+import { DocumentComparisonModal } from './document-comparison-modal';
 
 interface ArtifactStudioProps {
   notebookId: string;
   readySourceCount: number;
+  sources?: Source[];
 }
 
 interface GeneratorOption {
@@ -33,6 +37,22 @@ interface GeneratorOption {
 }
 
 const GENERATOR_OPTIONS: GeneratorOption[] = [
+  {
+    kind: 'comparison',
+    title: 'Matriks Komparasi Dokumen',
+    desc: 'Bandingkan 2 atau lebih dokumen dalam tabel perbandingan aspek kunci, klausul & anggaran.',
+    icon: Scale,
+    color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 border-indigo-200 dark:border-indigo-900',
+    badgeColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+  },
+  {
+    kind: 'audio_overview',
+    title: 'Audio Overview (AI Podcast)',
+    desc: 'Obrolan podcast 2 pembicara (Host & Analis) yang membahas intisari dokumen dengan suara alami.',
+    icon: Radio,
+    color: 'text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/50 border-orange-200 dark:border-orange-900',
+    badgeColor: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+  },
   {
     kind: 'summary',
     title: 'Ringkasan Eksekutif',
@@ -75,12 +95,13 @@ const GENERATOR_OPTIONS: GeneratorOption[] = [
   },
 ];
 
-export function ArtifactStudio({ notebookId, readySourceCount }: ArtifactStudioProps) {
+export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: ArtifactStudioProps) {
   const [artifacts, setArtifacts] = useState<Artifact[]>([]);
   const [loadingList, setLoadingList] = useState(true);
   const [generatingKind, setGeneratingKind] = useState<ArtifactKind | null>(null);
   const [activeArtifact, setActiveArtifact] = useState<Artifact | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [comparisonModalOpen, setComparisonModalOpen] = useState(false);
 
   const fetchArtifacts = async () => {
     try {
@@ -100,9 +121,18 @@ export function ArtifactStudio({ notebookId, readySourceCount }: ArtifactStudioP
     fetchArtifacts();
   }, [notebookId]);
 
-  const handleGenerate = async (kind: ArtifactKind) => {
+  const handleGenerate = async (
+    kind: ArtifactKind,
+    sourceIds?: string[],
+    customPrompt?: string
+  ) => {
     if (readySourceCount === 0) {
       setError('Unggah dan aktifkan minimal 1 dokumen sumber terlebih dahulu untuk menghasilkan dokumen.');
+      return;
+    }
+
+    if (kind === 'comparison' && !sourceIds) {
+      setComparisonModalOpen(true);
       return;
     }
 
@@ -113,7 +143,7 @@ export function ArtifactStudio({ notebookId, readySourceCount }: ArtifactStudioP
       const res = await fetch('/api/artifacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notebookId, kind }),
+        body: JSON.stringify({ notebookId, kind, sourceIds, customPrompt }),
       });
 
       if (!res.ok) {
@@ -130,6 +160,7 @@ export function ArtifactStudio({ notebookId, readySourceCount }: ArtifactStudioP
       setError(err.message || 'Terjadi kesalahan saat memproses artifact.');
     } finally {
       setGeneratingKind(null);
+      setComparisonModalOpen(false);
     }
   };
 
@@ -307,6 +338,17 @@ export function ArtifactStudio({ notebookId, readySourceCount }: ArtifactStudioP
           </div>
         )}
       </div>
+
+      {/* Document Comparison Modal */}
+      <DocumentComparisonModal
+        isOpen={comparisonModalOpen}
+        onClose={() => setComparisonModalOpen(false)}
+        sources={sources}
+        onGenerate={(selectedIds, customNote) => {
+          handleGenerate('comparison', selectedIds, customNote);
+        }}
+        isGenerating={generatingKind === 'comparison'}
+      />
 
       {/* Artifact Viewer Modal */}
       {activeArtifact && (

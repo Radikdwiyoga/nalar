@@ -12,6 +12,30 @@ const KIND_PROMPTS: Record<ArtifactKind, string> = {
   study_guide: 'Buatkan Panduan Belajar (Study Guide) lengkap yang mencakup konsep-konsep kunci, glosarium istilah, ringkasan per bagian, dan pertanyaan latihan pemahaman.',
   timeline: 'Ekstrak dan susun kronologi/timeline urutan kejadian, perkembangan waktu, atau tahapan proses yang tercatat dalam dokumen.',
   briefing: 'Buatkan dokumen briefing padat dan tajam untuk pimpinan eksekutif yang mencakup latar belakang, data kunci, implikasi, dan rekomendasi aksi.',
+  comparison: `Lakukan analisis perbandingan komparatif yang sangat mendalam dan terstruktur antar dokumen yang disediakan.
+Sajikan dalam format berikut:
+1. # Ringkasan Komparasi & Identifikasi Dokumen
+2. ## Matriks Perbandingan Komprehensif
+Sajikan dalam Tabel Markdown yang rapi dengan kolom:
+| Aspek / Parameter | Dokumen A | Dokumen B | Analisis Perbedaan & Temuan Kritis |
+Bandingkan secara spesifik:
+- Ruang Lingkup Pekerjaan & Spesifikasi Teknis
+- Nilai Anggaran / Finansial & Skema Pembayaran
+- Jangka Waktu Pelaksanaan & Milestone Kunci
+- Hak, Kewajiban, dan Klausul Regulasi
+- Batasan Risiko, SLA, Garansi, dan Denda/Penalti
+3. ## Analisis Temuan Utama & Deviasi Signifikan
+4. ## Rekomendasi Keputusan & Mitigasi Risiko`,
+  audio_overview: `Buatkan naskah percakapan podcast audio yang sangat hidup, natural, dan menarik antara 2 pembicara yang membedah intisari seluruh dokumen ini:
+- **Maya (Host)**: Pembawa acara cerdas, santai, memandu diskusi, menanyakan analogi, dan merangkum poin inti agar mudah dipahami.
+- **Budi (Analis)**: Pakar yang menguasai isi dokumen secara detail, membeberkan fakta konkret, angka penting, dan implikasinya.
+
+Aturan Penulisan:
+- Gunakan format dialog: **Maya:** [kalimat] atau **Budi:** [kalimat]
+- Awali dengan opening podcast yang seru dan mengundang rasa ingin tahu.
+- Diskusikan poin-poin utama secara mengalir seperti obrolan nyata, bukan membaca teks kaku.
+- Tutup dengan kesimpulan praktis dan penutup podcast yang hangat.
+- Bahasa: Bahasa Indonesia yang luwes dan profesional.`,
 };
 
 export async function POST(request: Request) {
@@ -23,7 +47,7 @@ export async function POST(request: Request) {
   }
 
   const json = await request.json();
-  const { notebookId, kind = 'summary', sourceIds } = json;
+  const { notebookId, kind = 'summary', sourceIds, customPrompt } = json;
 
   if (!notebookId) {
     return NextResponse.json({ error: { code: 'BAD_REQUEST', message: 'notebookId wajib diisi' } }, { status: 400 });
@@ -46,13 +70,24 @@ export async function POST(request: Request) {
     );
   }
 
+  // Fetch sources list to label chunks by document filename
+  const { data: sourcesData } = await admin
+    .from('sources')
+    .select('id, file_name')
+    .eq('notebook_id', notebookId)
+    .eq('user_id', user.id);
+
+  const sourceNameMap = new Map<string, string>();
+  sourcesData?.forEach((s) => sourceNameMap.set(s.id, s.file_name));
+
   // Fetch chunks from the notebook milik user
+  const chunkLimit = Array.isArray(sourceIds) && sourceIds.length > 1 ? 64 : 40;
   let query = admin
     .from('source_chunks')
     .select('content, source_id, page_number')
     .eq('notebook_id', notebookId)
     .eq('user_id', user.id)
-    .limit(40);
+    .limit(chunkLimit);
 
   if (Array.isArray(sourceIds) && sourceIds.length > 0) {
     query = query.in('source_id', sourceIds);
@@ -68,10 +103,17 @@ export async function POST(request: Request) {
   }
 
   const contextText = chunks
-    .map((c, i) => `[Sumber ${i + 1}]:\n${c.content}`)
+    .map((c, i) => {
+      const srcName = sourceNameMap.get(c.source_id) || `Dokumen ${i + 1}`;
+      const pageInfo = c.page_number ? ` (Hal. ${c.page_number})` : '';
+      return `[${srcName}${pageInfo}]:\n${c.content}`;
+    })
     .join('\n\n');
 
-  const artifactPrompt = KIND_PROMPTS[kind as ArtifactKind] || KIND_PROMPTS.summary;
+  const basePrompt = KIND_PROMPTS[kind as ArtifactKind] || KIND_PROMPTS.summary;
+  const artifactPrompt = customPrompt
+    ? `${basePrompt}\n\n=== INSTRUKSI KHUSUS DARI PENGGUNA ===\n${customPrompt}`
+    : basePrompt;
 
   const messages = [
     {
@@ -101,21 +143,46 @@ export async function POST(request: Request) {
       study_guide: 'Panduan Belajar',
       timeline: 'Kronologi Waktu',
       briefing: 'Dokumen Briefing',
+      comparison: 'Matriks Komparasi Dokumen',
+      audio_overview: 'Naskah Podcast Audio Diskusi',
     };
 
-    const { data: artifact, error } = await admin
+    let insertKind = kind;
+    let { data: artifact, error } = await admin
       .from('artifacts')
       .insert({
         notebook_id: notebookId,
         user_id: user.id,
-        kind: kind as any,
+        kind: insertKind as any,
         title: titles[kind as ArtifactKind] || 'Dokumen Hasil Sintesis',
         content_md: contentMd,
+        source_ids: Array.isArray(sourceIds) ? sourceIds : [],
         provider: chatResult.provider as any,
         model: chatResult.model,
       })
       .select()
       .single();
+
+    // Fallback if Postgres enum doesn't yet have 'comparison' or 'audio_overview'
+    if (error && (insertKind === 'comparison' || insertKind === 'audio_overview')) {
+      insertKind = 'briefing';
+      const fallbackResult = await admin
+        .from('artifacts')
+        .insert({
+          notebook_id: notebookId,
+          user_id: user.id,
+          kind: insertKind as any,
+          title: titles[kind as ArtifactKind] || 'Dokumen Hasil Sintesis',
+          content_md: contentMd,
+          source_ids: Array.isArray(sourceIds) ? sourceIds : [],
+          provider: chatResult.provider as any,
+          model: chatResult.model,
+        })
+        .select()
+        .single();
+      artifact = fallbackResult.data;
+      error = fallbackResult.error;
+    }
 
     if (error) {
       throw error;

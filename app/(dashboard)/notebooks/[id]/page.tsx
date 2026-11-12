@@ -213,6 +213,7 @@ export default function NotebookDetailPage({
             <ArtifactStudio
               notebookId={notebookId}
               readySourceCount={readySources.length}
+              sources={sources}
             />
           ) : (
             <div
