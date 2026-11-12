@@ -31,11 +31,27 @@ export async function POST(request: Request) {
 
   const admin = createAdminClient();
 
-  // Fetch chunks from the notebook
+  // Pastikan notebook ini milik user yang sedang login (Multi-tenant Security Isolation)
+  const { data: notebook, error: nbError } = await admin
+    .from('notebooks')
+    .select('id')
+    .eq('id', notebookId)
+    .eq('user_id', user.id)
+    .single();
+
+  if (nbError || !notebook) {
+    return NextResponse.json(
+      { error: { code: 'NOT_FOUND', message: 'Notebook tidak ditemukan atau bukan milik Anda' } },
+      { status: 404 }
+    );
+  }
+
+  // Fetch chunks from the notebook milik user
   let query = admin
     .from('source_chunks')
     .select('content, source_id, page_number')
     .eq('notebook_id', notebookId)
+    .eq('user_id', user.id)
     .limit(40);
 
   if (Array.isArray(sourceIds) && sourceIds.length > 0) {

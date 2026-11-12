@@ -104,7 +104,8 @@ export async function POST(
       share_token: shareToken,
       updated_at: new Date().toISOString(),
     })
-    .eq('id', notebookId);
+    .eq('id', notebookId)
+    .eq('user_id', user.id);
 
   // If columns do not exist in DB yet, fallback to JSON in description
   if (directErr) {
@@ -121,7 +122,8 @@ export async function POST(
         description: metaJson,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', notebookId);
+      .eq('id', notebookId)
+      .eq('user_id', user.id);
   }
 
   const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://nalar-five.vercel.app';
