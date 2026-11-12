@@ -31,6 +31,14 @@ export async function GET(
     .from('sources')
     .createSignedUrl(source.storage_path, 300);
 
+  // Fetch chunks for in-app reader & smart citation highlight
+  const { data: chunks } = await admin
+    .from('source_chunks')
+    .select('id, chunk_index, content, page_number, sheet_name, heading_path')
+    .eq('source_id', id)
+    .eq('user_id', user.id)
+    .order('chunk_index', { ascending: true });
+
   return NextResponse.json({
     data: {
       id: source.id,
@@ -48,6 +56,7 @@ export async function GET(
       enabled: source.enabled,
       error: source.error_message,
       downloadUrl: signed?.signedUrl || null,
+      chunks: chunks || [],
       updatedAt: source.updated_at,
     },
   });

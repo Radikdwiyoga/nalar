@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ChatMessage, Citation } from '@/lib/types';
 import { CitationChip } from './citation-chip';
-import { Bot, User, Cpu, Download, Copy, Check, FileText, Loader2 } from 'lucide-react';
+import { Bot, User, Cpu, Download, Copy, Check, FileText, Loader2, BookOpen } from 'lucide-react';
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -16,6 +16,29 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
   const isUser = message.role === 'user';
   const [copied, setCopied] = useState(false);
   const [downloadingDocx, setDownloadingDocx] = useState(false);
+
+  // Map citations by uppercase marker (e.g. "S1", "S2")
+  const citationsByMarker = useMemo(() => {
+    const map = new Map<string, Citation>();
+    message.citations?.forEach((c) => {
+      map.set(c.marker.toUpperCase(), c);
+    });
+    return map;
+  }, [message.citations]);
+
+  // Turn inline citation tags [S1] or [S1 Hal. 3] into interactive link targets
+  const processedContent = useMemo(() => {
+    if (isUser || !message.citations || message.citations.length === 0) {
+      return message.content;
+    }
+    return message.content.replace(/\[(S\d+)([^\]]*)\]/g, (match, marker) => {
+      const upperMarker = marker.toUpperCase();
+      if (citationsByMarker.has(upperMarker)) {
+        return `[${match}](#cite-${upperMarker})`;
+      }
+      return match;
+    });
+  }, [message.content, message.citations, isUser, citationsByMarker]);
 
   const handleCopy = async () => {
     try {
@@ -121,8 +144,46 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
             isUser ? 'text-primary-foreground' : 'text-foreground'
           }`}
         >
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {message.content}
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              a: ({ href, children }) => {
+                if (href?.startsWith('#cite-')) {
+                  const marker = href.replace('#cite-', '');
+                  const cit = citationsByMarker.get(marker);
+                  return (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (cit) onCitationClick?.(cit);
+                      }}
+                      className="inline-flex items-center gap-0.5 px-1.5 py-0.2 mx-0.5 rounded-md bg-primary/10 hover:bg-primary/20 text-primary text-[11px] font-semibold border border-primary/30 transition-all cursor-pointer align-baseline no-underline shadow-2xs"
+                      title={
+                        cit
+                          ? `Buka dokumen: ${cit.sourceName || marker}${cit.page ? ` (Hal. ${cit.page})` : ''}`
+                          : `Sitasi ${marker}`
+                      }
+                    >
+                      <BookOpen className="w-2.5 h-2.5 shrink-0" />
+                      <span>{children}</span>
+                    </button>
+                  );
+                }
+                return (
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline hover:text-primary/80"
+                  >
+                    {children}
+                  </a>
+                );
+              },
+            }}
+          >
+            {processedContent}
           </ReactMarkdown>
         </div>
 
