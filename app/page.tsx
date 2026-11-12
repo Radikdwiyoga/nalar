@@ -102,10 +102,10 @@ export default function HomePage() {
                 <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
                 <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                <span className="ml-2 font-semibold text-foreground truncate">Project 2026 • Analisis SPK & TOR</span>
+                <span className="ml-2 font-semibold text-foreground truncate">Riset Pasar & Inovasi 2026</span>
               </div>
               <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium text-[11px]">
-                16 Dokumen Aktif
+                8 Dokumen Aktif
               </span>
             </div>
 
@@ -116,32 +116,32 @@ export default function HomePage() {
                 <div className="p-2 rounded-lg bg-card border flex items-center justify-between shadow-xs">
                   <div className="flex items-center gap-2 truncate">
                     <FileText className="w-4 h-4 text-primary shrink-0" />
-                    <span className="font-medium truncate">SPK_4300005149_PLO.pdf</span>
+                    <span className="font-medium truncate">Laporan_Industri_AI_2026.pdf</span>
                   </div>
                   <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0" />
                 </div>
                 <div className="p-2 rounded-lg bg-card border flex items-center justify-between shadow-xs">
                   <div className="flex items-center gap-2 truncate">
                     <FileText className="w-4 h-4 text-primary shrink-0" />
-                    <span className="font-medium truncate">TOR Storage ODC 2024.pdf</span>
+                    <span className="font-medium truncate">Analisis_Pasar_Global.xlsx</span>
                   </div>
                   <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0" />
                 </div>
                 <div className="p-2 rounded-lg bg-card border flex items-center justify-between shadow-xs">
                   <div className="flex items-center gap-2 truncate">
                     <FileText className="w-4 h-4 text-primary shrink-0" />
-                    <span className="font-medium truncate">SPK Pengadaan Server.pdf</span>
+                    <span className="font-medium truncate">Strategi_Transformasi.docx</span>
                   </div>
                   <CheckCircle2 className="w-3.5 h-3.5 text-green-600 shrink-0" />
                 </div>
-                <p className="text-[10px] text-muted-foreground text-center pt-1">+ 13 dokumen lainnya aktif</p>
+                <p className="text-[10px] text-muted-foreground text-center pt-1">+ 5 dokumen lainnya aktif</p>
               </div>
 
               {/* Right Column: Chat QA & Word Download Card */}
               <div className="md:col-span-8 flex flex-col gap-2.5 p-2 sm:p-3 rounded-xl bg-card border shadow-xs">
                 {/* User Message */}
                 <div className="self-end max-w-[85%] bg-primary text-primary-foreground p-3 rounded-2xl rounded-tr-xs text-xs font-medium">
-                  Rangkum semua dokumen SPK & TOR ke format Word secara detail.
+                  Rangkum temuan utama dari dokumen riset ke format Word secara detail.
                 </div>
 
                 {/* Assistant Message with Word Card */}
@@ -153,8 +153,8 @@ export default function HomePage() {
                         <FileText className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <p className="font-bold text-xs truncate">Rangkuman-Dokumen-SPK-dan-TOR.docx</p>
-                        <p className="text-[10px] text-muted-foreground">Microsoft Word • 16 Dokumen Terintegrasi</p>
+                        <p className="font-bold text-xs truncate">Rangkuman-Riset-Pasar-2026.docx</p>
+                        <p className="text-[10px] text-muted-foreground">Microsoft Word • Format Lengkap</p>
                       </div>
                     </div>
                     <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold">
@@ -164,13 +164,13 @@ export default function HomePage() {
                   </div>
 
                   <div className="p-3 rounded-xl bg-muted/40 border leading-relaxed space-y-1.5 text-foreground">
-                    <p className="font-bold text-primary"># Rangkuman Komprehensif SPK & TOR</p>
+                    <p className="font-bold text-primary"># Rangkuman Eksekutif Riset 2026</p>
                     <p>
-                      Berdasarkan analisis terhadap <strong>16 dokumen aktif</strong>, berikut rangkuman sistematis:
+                      Berdasarkan analisis terhadap dokumen yang diunggah, berikut ringkasan temuan utama:
                     </p>
                     <ul className="list-disc pl-4 space-y-0.5 text-muted-foreground">
-                      <li><strong>Kelompok SPK:</strong> Meliputi perpanjangan maintenance PureStorage (Rp15,7 Miliar) <span className="text-[10px] bg-primary/10 text-primary px-1 rounded font-mono">[S1 Hal. 1]</span> dan pengadaan server playground.</li>
-                      <li><strong>Kelompok TOR:</strong> Spesifikasi teknis penambahan kapasitas workload DC Tabanan & Ragunan.</li>
+                      <li><strong>Adopsi Teknologi AI:</strong> Terjadi peningkatan efisiensi operasional sebesar 35% pada berbagai sektor industri <span className="text-[10px] bg-primary/10 text-primary px-1 rounded font-mono">[S1 Hal. 4]</span>.</li>
+                      <li><strong>Efisiensi Anggaran:</strong> Fokus investasi pada otomatisasi alur kerja dan keamanan data perusahaan <span className="text-[10px] bg-primary/10 text-primary px-1 rounded font-mono">[S2 Hal. 12]</span>.</li>
                     </ul>
                   </div>
                 </div>
