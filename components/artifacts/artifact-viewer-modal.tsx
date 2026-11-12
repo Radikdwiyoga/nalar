@@ -19,6 +19,7 @@ const KIND_LABELS: Record<ArtifactKind, { label: string; color: string }> = {
   study_guide: { label: 'Panduan Belajar', color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300' },
   timeline: { label: 'Kronologi / Linimasa', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300' },
   briefing: { label: 'Dokumen Briefing', color: 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300' },
+  action_items: { label: 'Rekomendasi & Tindak Lanjut', color: 'bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300' },
   comparison: { label: 'Matriks Komparasi', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300' },
   audio_overview: { label: 'AI Podcast Diskusi', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300' },
 };

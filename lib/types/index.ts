@@ -1,7 +1,7 @@
 export type SourceStatus = 'queued' | 'processing' | 'ready' | 'failed';
 export type IngestStage = 'pending' | 'extract' | 'chunk' | 'embed' | 'index' | 'done';
 export type JobStatus = 'queued' | 'running' | 'done' | 'failed';
-export type ArtifactKind = 'summary' | 'faq' | 'study_guide' | 'timeline' | 'briefing' | 'comparison' | 'audio_overview';
+export type ArtifactKind = 'summary' | 'faq' | 'study_guide' | 'timeline' | 'briefing' | 'comparison' | 'audio_overview' | 'action_items';
 export type ProviderName = 'gemini' | 'groq' | 'local';
 
 export interface Profile {

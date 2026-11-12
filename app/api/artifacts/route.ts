@@ -12,6 +12,7 @@ const KIND_PROMPTS: Record<ArtifactKind, string> = {
   study_guide: 'Buatkan Panduan Belajar (Study Guide) lengkap yang mencakup konsep-konsep kunci, glosarium istilah, ringkasan per bagian, dan pertanyaan latihan pemahaman.',
   timeline: 'Ekstrak dan susun kronologi/timeline urutan kejadian, perkembangan waktu, atau tahapan proses yang tercatat dalam dokumen.',
   briefing: 'Buatkan dokumen briefing padat dan tajam untuk pimpinan eksekutif yang mencakup latar belakang, data kunci, implikasi, dan rekomendasi aksi.',
+  action_items: 'Identifikasi dan susun daftar rekomendasi strategis, poin tindak lanjut (action items), penanggung jawab, mitigasi risiko, dan prioritas tindakan dari dokumen secara terstruktur.',
   comparison: `Lakukan analisis perbandingan komparatif yang sangat mendalam dan terstruktur antar dokumen yang disediakan.
 Sajikan dalam format berikut:
 1. # Ringkasan Komparasi & Identifikasi Dokumen
@@ -143,6 +144,7 @@ export async function POST(request: Request) {
       study_guide: 'Panduan Belajar',
       timeline: 'Kronologi Waktu',
       briefing: 'Dokumen Briefing',
+      action_items: 'Rekomendasi & Tindak Lanjut',
       comparison: 'Matriks Komparasi Dokumen',
       audio_overview: 'Naskah Podcast Audio Diskusi',
     };
@@ -163,8 +165,8 @@ export async function POST(request: Request) {
       .select()
       .single();
 
-    // Fallback if Postgres enum doesn't yet have 'comparison' or 'audio_overview'
-    if (error && (insertKind === 'comparison' || insertKind === 'audio_overview')) {
+    // Fallback if Postgres enum doesn't yet have 'comparison', 'audio_overview', or 'action_items'
+    if (error && (insertKind === 'comparison' || insertKind === 'audio_overview' || insertKind === 'action_items')) {
       insertKind = 'briefing';
       const fallbackResult = await admin
         .from('artifacts')
