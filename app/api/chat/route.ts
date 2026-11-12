@@ -139,12 +139,13 @@ export async function POST(request: Request) {
     console.warn('Query embedding failed, falling back to full-text only search');
   }
 
+  const adaptiveLimit = Math.min(64, Math.max(36, enabledIds.length * 3));
   const retrievedChunks = await hybridSearch({
     notebookId,
     queryText: question,
     queryEmbedding,
     enabledSourceIds: enabledIds,
-    limit: 12,
+    limit: adaptiveLimit,
   });
 
   const { contextText, citationsList } = buildContextAndCitations(retrievedChunks, sourcesMap);

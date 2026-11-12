@@ -11,11 +11,10 @@ export function buildContextAndCitations(
   const citationsList: Citation[] = [];
   const blocks: string[] = [];
 
-  const docNames = Array.from(sourcesMap.values())
-    .map((s) => s.fileName)
-    .join(', ');
+  const docEntries = Array.from(sourcesMap.values());
+  const docList = docEntries.map((s, idx) => `${idx + 1}. ${s.fileName}`).join('\n');
 
-  const header = `Dokumen Aktif dalam Notebook: ${docNames || 'Tidak ada'}\n\n`;
+  const header = `=== DAFTAR SELURUH DOKUMEN SUMBER AKTIF (Total: ${docEntries.length} Dokumen) ===\nDokumen yang tersedia dalam notebook ini:\n${docList || 'Tidak ada dokumen aktif'}\n\n=== KUTIPAN KONTEN DOKUMEN SUMBER TERKAIT (Total: ${chunks.length} Bagian) ===\n\n`;
 
   chunks.forEach((chunk, index) => {
     const marker = `S${index + 1}`;
