@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Plus, BookOpen, Clock, FileText, Trash2, Loader2, FolderPlus } from 'lucide-react';
+import { Plus, BookOpen, Clock, FileText, Trash2, Loader2, FolderPlus, Sparkles, Layers } from 'lucide-react';
 import { Notebook } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
@@ -78,81 +78,131 @@ export default function NotebooksPage() {
     }
   };
 
+  const totalSourcesCount = notebooks.reduce((acc, n) => acc + (n.sources_count || 0), 0);
+
   return (
     <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto w-full space-y-6 sm:space-y-8">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-4 sm:pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b pb-5 sm:pb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Notebook Saya</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight">Notebook Saya</h1>
+            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+              {notebooks.length} Ruang
+            </span>
+          </div>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
             Kumpulan ruang riset terisolasi untuk mengorganisir dokumen & tanya-jawab AI
           </p>
         </div>
+
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-primary/90 transition shadow-sm self-start sm:self-auto"
+          className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-primary/90 transition shadow-sm hover:shadow hover:scale-[1.01] active:scale-[0.99] self-start sm:self-auto cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>Buat Notebook Baru</span>
         </button>
       </div>
 
+      {/* Summary KPI Badges */}
+      {!loading && notebooks.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+          <div className="glass-card p-3.5 sm:p-4 rounded-xl flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
+              <BookOpen className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-[11px] text-muted-foreground font-medium">Total Notebook</p>
+              <p className="text-base sm:text-lg font-bold">{notebooks.length}</p>
+            </div>
+          </div>
+
+          <div className="glass-card p-3.5 sm:p-4 rounded-xl flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-indigo-500/10 text-indigo-600 flex items-center justify-center shrink-0">
+              <Layers className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-[11px] text-muted-foreground font-medium">Dokumen Tersimpan</p>
+              <p className="text-base sm:text-lg font-bold">{totalSourcesCount}</p>
+            </div>
+          </div>
+
+          <div className="glass-card p-3.5 sm:p-4 rounded-xl hidden sm:flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-[11px] text-muted-foreground font-medium">Multi-Source AI</p>
+              <p className="text-xs font-semibold text-emerald-600">Aktif & Siap</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Grid of Notebooks */}
       {loading ? (
-        <div className="flex items-center justify-center py-24 text-muted-foreground">
-          <Loader2 className="w-8 h-8 animate-spin" />
+        <div className="flex flex-col items-center justify-center py-24 text-muted-foreground gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-xs">Memuat daftar notebook Anda...</p>
         </div>
       ) : notebooks.length === 0 ? (
-        <div className="text-center py-20 px-4 border-2 border-dashed rounded-2xl bg-muted/20">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4">
+        <div className="text-center py-16 sm:py-20 px-4 border-2 border-dashed rounded-3xl glass-card">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-4 shadow-xs">
             <FolderPlus className="w-8 h-8" />
           </div>
-          <h3 className="text-lg font-semibold mb-1">Belum ada Notebook</h3>
-          <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-6">
+          <h3 className="text-lg font-bold mb-1">Belum Ada Notebook</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto mb-6 leading-relaxed">
             Mulai riset Anda dengan membuat notebook pertama untuk mengunggah PDF, Word, atau data Anda.
           </p>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/90 transition shadow-sm"
+            className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-primary/90 transition shadow-sm cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Buat Notebook Pertama</span>
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {notebooks.map((nb) => (
             <Link
               key={nb.id}
               href={`/notebooks/${nb.id}`}
-              className="group relative bg-card border rounded-xl p-5 hover:border-primary/50 hover:shadow-md transition-all flex flex-col justify-between"
+              className="group relative glass-card rounded-2xl p-5 hover:border-primary/50 hover:shadow-lg hover:-translate-y-0.5 transition-all flex flex-col justify-between"
             >
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <div className="w-9 h-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
                     <BookOpen className="w-4 h-4" />
                   </div>
                   <button
                     onClick={(e) => handleDelete(nb.id, e)}
                     title="Hapus Notebook"
-                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all"
+                    className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-                <h3 className="font-semibold text-lg tracking-tight group-hover:text-primary transition-colors line-clamp-1">
+
+                <h3 className="font-bold text-base sm:text-lg tracking-tight group-hover:text-primary transition-colors line-clamp-1">
                   {nb.title}
                 </h3>
-                {nb.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">
+
+                {nb.description ? (
+                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                     {nb.description}
+                  </p>
+                ) : (
+                  <p className="text-xs text-muted-foreground/60 italic">
+                    Tidak ada deskripsi tambahan
                   </p>
                 )}
               </div>
 
-              <div className="flex items-center justify-between pt-6 border-t mt-4 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5" />
+              <div className="flex items-center justify-between pt-4 border-t mt-4 text-[11px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 font-medium">
+                  <FileText className="w-3.5 h-3.5 text-primary/70" />
                   {nb.sources_count || 0} sumber
                 </span>
                 <span className="inline-flex items-center gap-1.5">
@@ -160,6 +210,7 @@ export default function NotebooksPage() {
                   {new Date(nb.updated_at).toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'short',
+                    year: 'numeric',
                   })}
                 </span>
               </div>
@@ -170,8 +221,8 @@ export default function NotebooksPage() {
 
       {/* Create Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md bg-card border rounded-2xl p-6 shadow-xl space-y-5 animate-in fade-in-0 zoom-in-95">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md p-4 animate-in fade-in-0">
+          <div className="w-full max-w-md glass-card border rounded-2xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95">
             <div>
               <h2 className="text-lg font-bold">Buat Notebook Baru</h2>
               <p className="text-xs text-muted-foreground mt-1">
@@ -180,7 +231,7 @@ export default function NotebooksPage() {
             </div>
 
             {error && (
-              <div className="text-xs text-destructive bg-destructive/10 p-2.5 rounded-lg border border-destructive/20">
+              <div className="text-xs text-destructive bg-destructive/10 p-2.5 rounded-xl border border-destructive/20">
                 {error}
               </div>
             )}
@@ -198,8 +249,8 @@ export default function NotebooksPage() {
                   maxLength={100}
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
-                  placeholder="Contoh: Analisis Laporan Keuangan 2024"
-                  className="w-full px-3 py-2 text-sm rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+                  placeholder="Contoh: Analisis SPK & Pengadaan 2026"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
                 />
               </div>
 
@@ -214,26 +265,25 @@ export default function NotebooksPage() {
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
                   placeholder="Catatan tambahan mengenai ruang notebook ini..."
-                  className="w-full px-3 py-2 text-sm rounded-lg border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none"
+                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none"
                 />
               </div>
 
-              <div className="flex justify-end gap-2.5 pt-2">
+              <div className="flex items-center justify-end gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  disabled={creating}
-                  className="px-4 py-2 rounded-lg text-xs font-medium border hover:bg-muted transition"
+                  className="px-4 py-2 rounded-xl border hover:bg-muted text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={creating || !newTitle.trim()}
-                  className="px-4 py-2 rounded-lg text-xs font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition flex items-center gap-1.5"
+                  className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2 rounded-xl text-xs font-semibold hover:bg-primary/90 disabled:opacity-50 transition shadow-sm cursor-pointer"
                 >
-                  {creating && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>Buat Notebook</span>
+                  {creating ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+                  <span>{creating ? 'Membuat...' : 'Buat Notebook'}</span>
                 </button>
               </div>
             </form>
@@ -243,4 +293,3 @@ export default function NotebooksPage() {
     </div>
   );
 }
-
