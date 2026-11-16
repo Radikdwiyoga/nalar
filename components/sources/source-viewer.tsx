@@ -15,6 +15,7 @@ import {
   Check,
   Download,
   Layers,
+  ChevronLeft,
   ChevronRight,
   BookOpen,
   ArrowRight,
@@ -216,19 +217,71 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
           </div>
         </div>
 
+        {/* Active Grounded Citation Banner (NotebookLM / Claude Style) */}
+        {activeCitation && (
+          <div className="p-3 sm:p-3.5 bg-[#FFFBEB] border-b border-[#FDE68A] text-xs shrink-0 flex flex-col gap-2 shadow-2xs">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="px-2 py-0.5 rounded-full bg-[#C25127] text-white font-bold text-[10px] tracking-wide shrink-0 shadow-2xs">
+                  SITASI AKTIF [{activeCitation.marker}]
+                </span>
+                {activeCitation.page && (
+                  <span className="font-semibold text-amber-900 text-[11px] bg-amber-200/70 px-2 py-0.5 rounded-md border border-amber-300 shrink-0">
+                    Halaman {activeCitation.page}
+                  </span>
+                )}
+                {activeCitation.sheet && (
+                  <span className="font-semibold text-amber-900 text-[11px] bg-amber-200/70 px-2 py-0.5 rounded-md border border-amber-300 shrink-0">
+                    Sheet: {activeCitation.sheet}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                {activeTab === 'pdf' ? (
+                  <button
+                    onClick={() => setActiveTab('text')}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-[#DFC9B8] text-xs font-semibold text-[#A6421D] hover:bg-[#F3EAE2] transition shadow-2xs cursor-pointer"
+                  >
+                    <Sparkles className="w-3 h-3 text-[#C25127]" />
+                    <span>Sorot di Teks Asli</span>
+                  </button>
+                ) : isPdf ? (
+                  <button
+                    onClick={() => {
+                      setActiveTab('pdf');
+                      if (activeCitation.page) setCurrentPage(activeCitation.page);
+                    }}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-[#DFC9B8] text-xs font-semibold text-[#A6421D] hover:bg-[#F3EAE2] transition shadow-2xs cursor-pointer"
+                  >
+                    <BookOpen className="w-3 h-3 text-[#C25127]" />
+                    <span>Buka di Halaman PDF</span>
+                  </button>
+                ) : null}
+              </div>
+            </div>
+
+            {activeCitation.snippet && (
+              <div className="p-2 sm:p-2.5 rounded-xl bg-white/90 border border-amber-200 text-amber-950 text-xs italic leading-relaxed font-serif shadow-2xs">
+                &ldquo;{activeCitation.snippet}&rdquo;
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Tab Navigation & Subheader */}
-        <div className="px-3 sm:px-4 py-2 border-b bg-muted/10 flex items-center justify-between gap-2 shrink-0">
-          <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-xl border text-xs">
+        <div className="px-3 sm:px-4 py-2 border-b border-[#E5E0D5] bg-[#FAF8F5]/80 flex items-center justify-between gap-2 shrink-0">
+          <div className="flex items-center gap-1 bg-[#F3F0EA] p-1 rounded-xl border border-[#E5E0D5] text-xs">
             {isPdf && (
               <button
                 onClick={() => setActiveTab('pdf')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition cursor-pointer ${
                   activeTab === 'pdf'
-                    ? 'bg-background text-foreground shadow-xs font-semibold'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-white text-nalar-text shadow-2xs font-semibold'
+                    : 'text-nalar-muted hover:text-nalar-text'
                 }`}
               >
-                <BookOpen className="w-3.5 h-3.5 text-primary" />
+                <BookOpen className="w-3.5 h-3.5 text-nalar-accent" />
                 <span>Dokumen Asli (PDF)</span>
               </button>
             )}
@@ -237,11 +290,11 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
               onClick={() => setActiveTab('text')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition cursor-pointer ${
                 activeTab === 'text'
-                  ? 'bg-background text-foreground shadow-xs font-semibold'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'bg-white text-nalar-text shadow-2xs font-semibold'
+                  : 'text-nalar-muted hover:text-nalar-text'
               }`}
             >
-              <Layers className="w-3.5 h-3.5 text-blue-500" />
+              <Layers className="w-3.5 h-3.5 text-blue-600" />
               <span>Teks & Chunks ({sourceData?.chunkCount || 0})</span>
             </button>
           </div>
@@ -249,12 +302,12 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
           {/* Quick jump to cited page if PDF and citation exists */}
           {activeTab === 'pdf' && isPdf && activeCitation?.page && (
             <div className="hidden sm:flex items-center gap-1.5 text-xs">
-              <span className="text-[11px] text-muted-foreground font-medium">
+              <span className="text-[11px] text-nalar-muted font-medium">
                 Kutipan di:
               </span>
               <button
                 onClick={() => setCurrentPage(activeCitation.page!)}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30 font-semibold text-[11px] hover:bg-amber-500/20 transition cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] font-semibold text-[11px] hover:bg-[#C25127] hover:text-white transition cursor-pointer"
               >
                 <Sparkles className="w-3 h-3" />
                 Hal. {activeCitation.page}
@@ -272,9 +325,52 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
             </div>
           ) : (
             <>
-              {/* TAB 1: PDF Viewer */}
+              {/* TAB 1: PDF Viewer with Page Navigation Controls */}
               {activeTab === 'pdf' && (
-                <div className="h-full flex flex-col relative bg-muted/30">
+                <div className="h-full flex flex-col relative bg-[#F3F0EA]">
+                  {/* PDF Toolbar / Page Controller */}
+                  {pdfEmbedUrl && (
+                    <div className="px-3 py-1.5 bg-[#FAF8F5] border-b border-[#E5E0D5] flex items-center justify-between text-xs text-nalar-muted shrink-0">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                          disabled={currentPage <= 1}
+                          className="p-1 rounded-md hover:bg-[#F3F0EA] disabled:opacity-40 transition cursor-pointer text-nalar-text"
+                          title="Halaman sebelumnya"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+
+                        <span className="font-mono text-xs text-nalar-text font-semibold px-2 py-0.5 bg-white rounded border border-[#E5E0D5]">
+                          Hal. {currentPage} {sourceData?.pageCount ? `dari ${sourceData.pageCount}` : ''}
+                        </span>
+
+                        <button
+                          onClick={() =>
+                            setCurrentPage((p) =>
+                              sourceData?.pageCount ? Math.min(sourceData.pageCount, p + 1) : p + 1
+                            )
+                          }
+                          disabled={Boolean(sourceData?.pageCount && currentPage >= sourceData.pageCount)}
+                          className="p-1 rounded-md hover:bg-[#F3F0EA] disabled:opacity-40 transition cursor-pointer text-nalar-text"
+                          title="Halaman berikutnya"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {activeCitation?.page && activeCitation.page !== currentPage && (
+                        <button
+                          onClick={() => setCurrentPage(activeCitation.page!)}
+                          className="text-[11px] text-[#C25127] font-semibold hover:underline flex items-center gap-1 cursor-pointer"
+                        >
+                          <span>Lompat ke Hal. Sitasi ({activeCitation.page})</span>
+                          <span>→</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+
                   {pdfEmbedUrl ? (
                     <div className="flex-1 h-full w-full relative">
                       <iframe
@@ -299,7 +395,7 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
                       <div className="flex items-center gap-2 pt-2">
                         <button
                           onClick={() => setActiveTab('text')}
-                          className="px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-xs font-medium shadow-xs"
+                          className="px-3 py-1.5 rounded-xl bg-nalar-accent text-white text-xs font-medium shadow-xs hover:bg-nalar-accentHover transition"
                         >
                           Buka Teks Dokumen
                         </button>
@@ -308,7 +404,7 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
                             href={sourceData.downloadUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-3 py-1.5 rounded-xl border bg-card text-xs font-medium hover:bg-muted"
+                            className="px-3 py-1.5 rounded-xl border border-[#E5E0D5] bg-white text-xs font-medium hover:bg-[#F3F0EA] text-nalar-text transition shadow-2xs"
                           >
                             Unduh File
                           </a>

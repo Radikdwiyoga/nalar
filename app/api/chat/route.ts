@@ -224,10 +224,11 @@ export async function POST(request: Request) {
           controller.enqueue(encoder.encode(deltaEvent));
         }
 
-        // Determine which citations were actually referenced in the response (e.g. [S1], [S2])
-        const usedCitations = citationsList.filter((cit) =>
-          fullAssistantText.includes(`[${cit.marker}]`)
-        );
+        // Determine which citations were actually referenced in the response (e.g. [S1], [S1 Hal. 2], [S1, S2])
+        const usedCitations = citationsList.filter((cit) => {
+          const regex = new RegExp(`\\[${cit.marker}\\b`, 'i');
+          return regex.test(fullAssistantText);
+        });
 
         // Send citations event
         const citationsEvent = `event: citations\ndata: ${JSON.stringify({
