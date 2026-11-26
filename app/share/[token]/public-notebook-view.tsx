@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { Artifact, Source } from '@/lib/types';
 import { ArtifactViewerModal } from '@/components/artifacts/artifact-viewer-modal';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 interface PublicNotebookViewProps {
   notebookTitle: string;
@@ -37,10 +38,10 @@ export function PublicNotebookView({
   return (
     <div className="min-h-screen flex flex-col bg-nalar-bg text-nalar-text">
       {/* Public Header */}
-      <header className="border-b border-[#E5E0D5] bg-[#FAF8F5]/90 backdrop-blur-md sticky top-0 z-30 px-4 h-16 flex items-center justify-between">
+      <header className="border-b border-nalar-border bg-nalar-card/85 backdrop-blur-md sticky top-0 z-30 px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3 min-w-0">
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="p-1 rounded-xl bg-[#F3EAE2] border border-[#DFC9B8]/70">
+            <div className="p-1 rounded-xl bg-nalar-citationBg border border-nalar-citationBorder">
               <Image
                 src="/logo-icon.png"
                 alt="Nalar"
@@ -54,20 +55,21 @@ export function PublicNotebookView({
             </span>
           </Link>
 
-          <div className="h-4 w-px bg-[#E5E0D5] shrink-0 hidden sm:block" />
+          <div className="h-4 w-px bg-nalar-border shrink-0 hidden sm:block" />
 
           <div className="flex items-center gap-2 min-w-0">
             <h1 className="font-serif font-bold text-sm tracking-tight truncate max-w-[160px] sm:max-w-xs md:max-w-md text-nalar-text">
               {notebookTitle}
             </h1>
-            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0 flex items-center gap-1">
+            <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 shrink-0 flex items-center gap-1">
               <Globe className="w-3 h-3" />
               <span>Publik (Hanya Baca)</span>
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
+          <ThemeToggle compact />
           <Link
             href="/signup"
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-nalar-accent text-white text-xs font-semibold hover:bg-nalar-accentHover transition-all shadow-xs"
@@ -79,13 +81,13 @@ export function PublicNotebookView({
       </header>
 
       {/* Tabs Navigation */}
-      <div className="border-b border-[#E5E0D5] bg-[#F3F0EA]/80 px-4">
+      <div className="border-b border-nalar-border bg-nalar-surface/80 px-4">
         <div className="max-w-5xl mx-auto flex items-center gap-2 text-xs font-medium overflow-x-auto">
           <button
             onClick={() => setActiveTab('artifacts')}
             className={`flex items-center gap-1.5 py-3 px-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
               activeTab === 'artifacts'
-                ? 'border-[#C25127] text-[#C25127] font-semibold'
+                ? 'border-nalar-accent text-nalar-accent font-semibold'
                 : 'border-transparent text-nalar-muted hover:text-nalar-text'
             }`}
           >
@@ -97,7 +99,7 @@ export function PublicNotebookView({
             onClick={() => setActiveTab('chat')}
             className={`flex items-center gap-1.5 py-3 px-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
               activeTab === 'chat'
-                ? 'border-[#C25127] text-[#C25127] font-semibold'
+                ? 'border-nalar-accent text-nalar-accent font-semibold'
                 : 'border-transparent text-nalar-muted hover:text-nalar-text'
             }`}
           >
@@ -109,7 +111,7 @@ export function PublicNotebookView({
             onClick={() => setActiveTab('sources')}
             className={`flex items-center gap-1.5 py-3 px-3 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
               activeTab === 'sources'
-                ? 'border-[#C25127] text-[#C25127] font-semibold'
+                ? 'border-nalar-accent text-nalar-accent font-semibold'
                 : 'border-transparent text-nalar-muted hover:text-nalar-text'
             }`}
           >
@@ -134,7 +136,7 @@ export function PublicNotebookView({
             </div>
 
             {artifacts.length === 0 ? (
-              <div className="p-8 border border-dashed border-[#DFC9B8] rounded-2xl bg-white/60 text-center text-xs text-nalar-muted">
+              <div className="p-8 border border-dashed border-nalar-citationBorder rounded-2xl bg-nalar-card/60 text-center text-xs text-nalar-muted">
                 Belum ada dokumen sintesis yang dibuat dalam notebook ini.
               </div>
             ) : (
@@ -143,16 +145,16 @@ export function PublicNotebookView({
                   <div
                     key={art.id}
                     onClick={() => setSelectedArtifact(art)}
-                    className="p-5 rounded-2xl border border-[#E5E0D5] bg-white hover:border-[#C25127] hover:shadow-sm cursor-pointer transition-all flex flex-col justify-between space-y-3 group"
+                    className="p-5 rounded-2xl floating-island hover:border-nalar-accent cursor-pointer transition-all flex flex-col justify-between space-y-3 group"
                   >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between text-[11px] text-nalar-muted">
-                        <span className="font-semibold px-2.5 py-0.5 rounded-full bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] capitalize">
+                        <span className="font-semibold px-2.5 py-0.5 rounded-full bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder capitalize">
                           {art.kind.replace('_', ' ')}
                         </span>
                         <span className="font-mono">{new Date(art.created_at).toLocaleDateString('id-ID')}</span>
                       </div>
-                      <h3 className="font-serif font-bold text-sm sm:text-base text-nalar-text group-hover:text-[#C25127] transition-colors line-clamp-1">
+                      <h3 className="font-serif font-bold text-sm sm:text-base text-nalar-text group-hover:text-nalar-accent transition-colors line-clamp-1">
                         {art.title}
                       </h3>
                       <p className="text-xs text-nalar-muted line-clamp-3 leading-relaxed">
@@ -160,7 +162,7 @@ export function PublicNotebookView({
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between pt-3 border-t border-[#E5E0D5]/70 text-xs text-[#C25127] font-semibold">
+                    <div className="flex items-center justify-between pt-3 border-t border-nalar-border/70 text-xs text-nalar-accent font-semibold">
                       <span className="flex items-center gap-1 group-hover:underline">
                         <span>Baca & Unduh Dokumen</span>
                         <ExternalLink className="w-3 h-3" />
@@ -186,7 +188,7 @@ export function PublicNotebookView({
             </div>
 
             {messages.length === 0 ? (
-              <div className="p-8 border border-dashed border-[#DFC9B8] rounded-2xl bg-white/60 text-center text-xs text-nalar-muted">
+              <div className="p-8 border border-dashed border-nalar-citationBorder rounded-2xl bg-nalar-card/60 text-center text-xs text-nalar-muted">
                 Belum ada percakapan dalam notebook ini.
               </div>
             ) : (
@@ -199,7 +201,7 @@ export function PublicNotebookView({
                       className={`flex gap-3 text-sm ${isUser ? 'justify-end' : 'justify-start'}`}
                     >
                       {!isUser && (
-                        <div className="w-8 h-8 rounded-lg bg-[#F3EAE2] text-[#C25127] border border-[#DFC9B8] flex items-center justify-center shrink-0 mt-0.5">
+                        <div className="w-8 h-8 rounded-lg bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder flex items-center justify-center shrink-0 mt-0.5">
                           <Bot className="w-4 h-4" />
                         </div>
                       )}
@@ -207,13 +209,13 @@ export function PublicNotebookView({
                         className={`max-w-[90%] sm:max-w-[85%] leading-relaxed ${
                           isUser
                             ? 'bg-nalar-accent text-white rounded-2xl rounded-tr-sm px-4 py-3 font-medium shadow-xs'
-                            : 'bg-white border border-[#E5E0D5] rounded-2xl rounded-tl-sm p-5 shadow-2xs text-nalar-text'
+                            : 'floating-island rounded-2xl rounded-tl-sm p-5 text-nalar-text'
                         }`}
                       >
                         {isUser ? (
                           <p className="whitespace-pre-wrap text-xs sm:text-sm">{m.content}</p>
                         ) : (
-                          <div className="prose prose-sm max-w-none text-nalar-text">
+                          <div className="prose prose-sm dark:prose-invert max-w-none text-nalar-text">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {m.content}
                             </ReactMarkdown>
@@ -244,10 +246,10 @@ export function PublicNotebookView({
               {sources.map((src) => (
                 <div
                   key={src.id}
-                  className="p-4 rounded-2xl border border-[#E5E0D5] bg-white flex items-center justify-between gap-3 shadow-2xs"
+                  className="p-4 rounded-2xl floating-island flex items-center justify-between gap-3"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl bg-[#F3EAE2] text-[#C25127] border border-[#DFC9B8] flex items-center justify-center shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder flex items-center justify-center shrink-0">
                       <FileText className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
@@ -258,7 +260,7 @@ export function PublicNotebookView({
                     </div>
                   </div>
 
-                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                  <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 shrink-0">
                     Siap
                   </span>
                 </div>

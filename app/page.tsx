@@ -2,408 +2,391 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   ArrowRight,
-  BookOpen,
-  ShieldCheck,
-  Zap,
-  Layers,
   Sparkles,
   FileText,
-  Download,
-  CheckCircle2,
-  Cpu,
-  Share2,
+  Layers,
   ScanText,
-  Scale,
   Radio,
-  Bookmark,
-  Check,
+  ShieldCheck,
+  CheckCircle2,
+  FileSpreadsheet,
+  Globe,
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { InteractiveHeroDemo } from '@/components/landing/interactive-hero-demo';
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col min-h-screen bg-nalar-bg text-nalar-text relative overflow-hidden">
-      {/* Editorial Header */}
-      <header className="sticky top-0 z-50 border-b border-[#E5E0D5] bg-[#FAF8F5]/90 backdrop-blur-md">
-        <div className="container mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div className="flex flex-col min-h-screen bg-nalar-bg text-nalar-text relative overflow-x-hidden">
+      {/* Floating Pill Glass Navbar */}
+      <div className="sticky top-3 z-50 px-3 sm:px-6 pt-2">
+        <header className="max-w-5xl mx-auto rounded-2xl glass px-4 sm:px-5 h-14 flex items-center justify-between shadow-xs">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="p-1 rounded-xl bg-[#F3EAE2] border border-[#DFC9B8]/60 group-hover:scale-105 transition-transform">
+            <div className="p-1 rounded-xl bg-nalar-citationBg border border-nalar-citationBorder group-hover:scale-105 transition-transform">
               <Image
                 src="/logo-icon.png"
                 alt="Nalar Logo"
-                width={30}
-                height={30}
-                className="w-7 h-7 object-contain"
+                width={26}
+                height={26}
+                className="w-6 h-6 object-contain"
                 priority
               />
             </div>
-            <div className="flex flex-col">
-              <span className="font-serif font-bold text-lg sm:text-xl tracking-tight leading-none text-nalar-text">
+            <div className="flex items-baseline gap-2">
+              <span className="font-serif font-bold text-lg tracking-tight text-nalar-text">
                 Nalar
               </span>
-              <span className="text-[10px] text-nalar-muted font-medium tracking-wide">
-                AI Document Synthesis
+              <span className="hidden md:inline text-[11px] text-nalar-muted font-medium">
+                AI Research Workspace
               </span>
             </div>
           </Link>
 
-          <div className="flex items-center gap-2 sm:gap-4">
+          <nav className="hidden md:flex items-center gap-6 text-xs font-medium text-nalar-muted">
+            <a href="#kapabilitas" className="hover:text-nalar-text transition-colors">
+              Kapabilitas
+            </a>
+            <a href="#alur-kerja" className="hover:text-nalar-text transition-colors">
+              Cara Kerja
+            </a>
+            <Link href="/notebooks" className="hover:text-nalar-text transition-colors">
+              Ruang Riset
+            </Link>
+          </nav>
+
+          <div className="flex items-center gap-2">
+            <ThemeToggle compact />
             <Link
               href="/login"
-              className="text-xs sm:text-sm font-medium text-nalar-muted hover:text-nalar-text px-3 py-1.5 rounded-lg hover:bg-[#F3F0EA] transition-colors"
+              className="text-xs font-semibold text-nalar-muted hover:text-nalar-text px-3 py-1.5 rounded-xl hover:bg-nalar-surface transition-colors"
             >
               Masuk
             </Link>
             <Link
               href="/signup"
-              className="text-xs sm:text-sm font-semibold bg-nalar-accent text-white hover:bg-nalar-accentHover px-4 py-2 rounded-xl transition-all shadow-xs flex items-center gap-1.5"
+              className="text-xs font-semibold bg-nalar-accent text-white hover:bg-nalar-accentHover px-3.5 sm:px-4 py-2 rounded-xl transition-all shadow-xs flex items-center gap-1.5"
             >
               <span>Mulai Gratis</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
       {/* Main Content */}
       <main className="flex-1 relative z-10">
-        {/* Hero Section */}
-        <section className="pt-14 pb-16 md:pt-20 md:pb-24 px-4 max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#DFC9B8] bg-[#F3EAE2] text-xs font-semibold text-[#A6421D] mb-6 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Editorial Warmth • Multi-Document RAG & Fact Grounding</span>
-          </div>
+        {/* Hero Section with Ambient Mesh & Faded Editorial Dot-Matrix */}
+        <section className="relative pt-12 pb-16 md:pt-16 md:pb-24 px-4 overflow-hidden">
+          <div className="absolute inset-0 editorial-grid-fade pointer-events-none opacity-75" aria-hidden="true" />
+          <div className="absolute inset-0 ambient-mesh pointer-events-none" aria-hidden="true" />
 
-          <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-5 leading-[1.18] max-w-4xl mx-auto text-nalar-text">
-            Pahami & Sintesis Dokumen Kompleks <br className="hidden sm:inline" />
-            <span className="gradient-text italic font-normal">Hanya Berdasarkan Fakta</span>
-          </h1>
+          <div className="relative max-w-6xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-nalar-citationBorder bg-nalar-citationBg text-xs font-semibold text-nalar-accent mb-6 shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Multi-Document Hybrid RAG • Vision OCR • 8 Format Studio AI</span>
+            </div>
 
-          <p className="text-sm sm:text-base md:text-lg text-nalar-muted mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
-            Upload hingga belasan PDF (termasuk hasil scan fisik), Word, dan Excel. Tanyakan apa saja dengan jaminan jawaban bersitasi halaman asli, dan ekspor rangkuman ke Word (.docx) dalam 1 klik.
-          </p>
+            <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-5 leading-[1.14] max-w-4xl mx-auto text-nalar-text">
+              Ruang Riset Cerdas yang Bersandar{' '}
+              <br className="hidden sm:inline" />
+              <span className="gradient-text italic font-normal">Sepenuhnya pada Fakta Berkas</span>
+            </h1>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-md mx-auto mb-14">
-            <Link
-              href="/signup"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-nalar-accent text-white font-semibold px-6 py-3 rounded-xl shadow-xs hover:bg-nalar-accentHover hover:scale-[1.01] active:scale-[0.99] transition-all text-xs sm:text-sm"
-            >
-              Mulai Sekarang Gratis
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              href="/login"
-              className="w-full sm:w-auto inline-flex items-center justify-center font-semibold px-6 py-3 rounded-xl border border-[#E5E0D5] bg-white hover:bg-[#F3F0EA] transition-all text-xs sm:text-sm text-nalar-text shadow-2xs"
-            >
-              Buka Notebook Saya
-            </Link>
-          </div>
+            <p className="text-sm sm:text-base md:text-lg text-nalar-muted mb-8 max-w-2xl mx-auto leading-relaxed">
+              Unggah puluhan PDF kontrak, scan fisik, dokumen Word, Excel, hingga Google Drive. Ajukan pertanyaan dengan sitasi halaman yang bisa diklik langsung, komparasikan dokumen, atau ekspor laporan Word (.docx) dalam 1 klik.
+            </p>
 
-          {/* 3-Column UI Mockup Showcase (Editorial Warmth Style) */}
-          <div className="bg-white rounded-2xl p-2.5 sm:p-4 border border-[#E5E0D5] shadow-sm max-w-5xl mx-auto text-left overflow-hidden">
-            {/* Mockup Header Bar */}
-            <div className="flex items-center justify-between pb-3 px-2 border-b border-[#E5E0D5] text-xs text-nalar-muted">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#E5E0D5]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#E5E0D5]" />
-                <span className="w-2.5 h-2.5 rounded-full bg-[#E5E0D5]" />
-                <span className="ml-2 font-serif font-bold text-nalar-text truncate">
-                  Project 2026 • Analisis Dokumen & Kontrak Kerja
-                </span>
-              </div>
-              <span className="px-2.5 py-0.5 rounded-full bg-[#F3EAE2] text-[#A6421D] font-semibold text-[11px] border border-[#DFC9B8]">
-                8 Dokumen Aktif
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-md mx-auto mb-8">
+              <Link
+                href="/signup"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-nalar-accent text-white font-semibold px-6 py-3 rounded-xl shadow-xs hover:bg-nalar-accentHover hover:scale-[1.01] active:scale-[0.99] transition-all text-xs sm:text-sm"
+              >
+                Buat Ruang Riset Gratis
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/notebooks"
+                className="w-full sm:w-auto inline-flex items-center justify-center font-semibold px-6 py-3 rounded-xl border border-nalar-border bg-nalar-card hover:bg-nalar-surface transition-all text-xs sm:text-sm text-nalar-text shadow-2xs"
+              >
+                Buka Notebook Saya
+              </Link>
+            </div>
+
+            {/* Format Support Strip */}
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-[11px] text-nalar-muted mb-12">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-nalar-card border border-nalar-border">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" /> PDF Digital & Scan OCR
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-nalar-card border border-nalar-border">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Word (.docx) & Excel (.xlsx)
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-nalar-card border border-nalar-border">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Google Drive, Docs & Web
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-nalar-card border border-nalar-border">
+                <ShieldCheck className="w-3 h-3 text-nalar-accent" /> Isolasi Privasi RLS
               </span>
             </div>
 
-            {/* 3-Column Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-3 pt-3 text-xs">
-              {/* Column 1 (3 Cols): Sumber Dokumen */}
-              <div className="hidden md:flex md:col-span-3 flex-col gap-2 p-3 rounded-xl bg-[#F3F0EA] border border-[#E5E0D5]">
-                <p className="font-bold text-[10px] uppercase tracking-wider text-nalar-muted">
-                  Sumber Dokumen (3/8)
-                </p>
-                <div className="p-2 rounded-lg bg-white border border-[#E5E0D5] flex items-center justify-between shadow-2xs">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <FileText className="w-3.5 h-3.5 text-nalar-accent shrink-0" />
-                    <span className="font-medium text-[11px] truncate text-nalar-text">SPK_Pengadaan_2026.pdf</span>
-                  </div>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                </div>
-                <div className="p-2 rounded-lg bg-white border border-[#E5E0D5] flex items-center justify-between shadow-2xs">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <FileText className="w-3.5 h-3.5 text-nalar-accent shrink-0" />
-                    <span className="font-medium text-[11px] truncate text-nalar-text">RAB_Alokasi_Biaya.xlsx</span>
-                  </div>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                </div>
-                <div className="p-2 rounded-lg bg-white border border-[#E5E0D5] flex items-center justify-between shadow-2xs">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <FileText className="w-3.5 h-3.5 text-nalar-accent shrink-0" />
-                    <span className="font-medium text-[11px] truncate text-nalar-text">TOR_Spesifikasi_Teknis.docx</span>
-                  </div>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                </div>
-                <p className="text-[10px] text-nalar-muted text-center pt-1 italic">+ 5 dokumen lainnya aktif</p>
-              </div>
-
-              {/* Column 2 (5 Cols): Chat Sintesis & Word Export Card */}
-              <div className="md:col-span-5 flex flex-col gap-2.5 p-3 rounded-xl bg-white border border-[#E5E0D5] shadow-2xs">
-                {/* User Message */}
-                <div className="self-end max-w-[90%] bg-nalar-accent text-white p-2.5 rounded-xl rounded-tr-xs text-[11px] font-medium shadow-2xs">
-                  Rangkum klausul utama SPK dan komparasikan dengan alokasi RAB ke format Word.
-                </div>
-
-                {/* AI Assistant Paper Response */}
-                <div className="space-y-2 text-xs">
-                  {/* Generated Word Card */}
-                  <div className="flex items-center justify-between p-2 rounded-xl border border-[#E5E0D5] bg-[#FAF8F5]">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div className="w-7 h-7 rounded-lg bg-[#F3EAE2] text-[#C25127] flex items-center justify-center shrink-0">
-                        <FileText className="w-3.5 h-3.5" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-bold text-[11px] truncate text-nalar-text">Rangkuman-SPK-dan-RAB.docx</p>
-                        <p className="text-[10px] text-nalar-muted">Microsoft Word • Lengkap</p>
-                      </div>
-                    </div>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-nalar-accent text-white text-[10px] font-semibold shrink-0">
-                      <Download className="w-2.5 h-2.5" />
-                      Unduh .docx
-                    </span>
-                  </div>
-
-                  {/* Synthesized Text with Interactive Citation Pills */}
-                  <div className="p-2.5 rounded-xl bg-[#FAF8F5] border border-[#E5E0D5] leading-relaxed space-y-1.5 text-nalar-text text-[11px]">
-                    <p className="font-serif font-bold text-xs text-nalar-text"># Ringkasan Eksekutif Analisis</p>
-                    <p>
-                      Berdasarkan ketentuan Pasal 4 ayat 2{' '}
-                      <span className="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] text-[10px] font-semibold cursor-pointer">
-                        [S1 Hal. 4]
-                      </span>
-                      , jadwal implementasi disepakati 90 hari kalender dengan termin pencairan bertahap sesuai capaian milestone di lembar RAB{' '}
-                      <span className="inline-flex items-center gap-0.5 px-1 py-0.2 rounded bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] text-[10px] font-semibold cursor-pointer">
-                        [S2 Sheet. 1]
-                      </span>.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Column 3 (4 Cols): Highlight Kutipan Dokumen Asli */}
-              <div className="hidden md:flex md:col-span-4 flex-col gap-2 p-3 rounded-xl bg-[#F3F0EA] border border-[#E5E0D5]">
-                <div className="flex items-center justify-between pb-1 border-b border-[#E5E0D5]/70">
-                  <div className="flex items-center gap-1 text-[11px] font-semibold text-nalar-text">
-                    <Bookmark className="w-3.5 h-3.5 text-nalar-accent" />
-                    <span>Inspeksi Sitasi [S1]</span>
-                  </div>
-                  <span className="text-[10px] font-mono text-nalar-muted">Hal. 4</span>
-                </div>
-
-                <div className="p-2 rounded-lg bg-white border border-[#E5E0D5] space-y-1 text-[11px]">
-                  <p className="font-semibold text-nalar-text truncate">SPK_Pengadaan_2026.pdf</p>
-                  <p className="text-[10px] text-nalar-muted">Chunk #14 • Terverifikasi</p>
-                </div>
-
-                {/* Highlighted Quote Box */}
-                <div className="p-2.5 rounded-xl bg-[#FEF3C7] border-l-4 border-[#C25127] border-y border-r border-[#E5E0D5] text-[11px] leading-relaxed text-nalar-text space-y-1 shadow-2xs">
-                  <span className="text-[10px] font-bold text-[#A6421D] uppercase block">
-                    Kutipan Asli Dokumen:
-                  </span>
-                  <p className="font-mono text-[10px] italic text-nalar-text/90">
-                    &quot;Pihak kedua wajib menyelesaikan seluruh instalasi sistem dan menyerahkan Berita Acara Serah Terima dalam waktu 90 hari kalender sejak SPMK terbit.&quot;
-                  </p>
-                </div>
-              </div>
-            </div>
+            {/* Live Clickable Multi-Tab Demo */}
+            <InteractiveHeroDemo />
           </div>
         </section>
 
-        {/* Feature Highlights Bento Grid */}
-        <section className="py-20 border-t border-[#E5E0D5] bg-[#F3F0EA]">
+        {/* Rich Visual Bento Grid */}
+        <section id="kapabilitas" className="py-20 border-t border-nalar-border bg-nalar-surface/70">
           <div className="container mx-auto px-4 sm:px-6 max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-14">
               <span className="text-xs font-bold uppercase tracking-widest text-nalar-accent mb-2 block">
-                Kapabilitas Inti
+                Arsitektur Kelas Eksekutif
               </span>
               <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 text-nalar-text">
-                Fitur Unggulan Riset Cerdas
+                Bukan Sekadar Chatbot — Melainkan Studio Analisis Utuh
               </h2>
               <p className="text-xs sm:text-sm text-nalar-muted leading-relaxed">
-                Dirancang dengan arsitektur multi-tenant aman, RAG hybrid search, dan antarmuka editorial yang nyaman untuk riset mendalam.
+                Setiap fitur dirancang untuk memangkas waktu telaah dokumen ratusan halaman menjadi hitungan detik tanpa mengorbankan ketelitian.
               </p>
             </div>
 
-            {/* Asymmetrical Bento Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
-              {/* Bento 1: Multi-Source Synthesis (Large: md:col-span-2) */}
-              <div className="md:col-span-2 bg-white border border-[#E5E0D5] p-6 sm:p-8 rounded-2xl flex flex-col justify-between shadow-2xs group hover:border-[#C25127] transition-all">
-                <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#F3EAE2] text-[#C25127] flex items-center justify-center">
-                    <Layers className="w-5 h-5" />
-                  </div>
-                  <h3 className="font-serif font-bold text-lg sm:text-xl text-nalar-text">
-                    Multi-Source Balanced Synthesis
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5">
+              {/* Bento 1 (7 Cols): Hybrid Multi-Source Synthesis with Visual Node Pipeline */}
+              <div className="md:col-span-7 floating-island rounded-3xl p-6 sm:p-8 flex flex-col justify-between gap-6 group hover:border-nalar-accent transition-all">
+                <div className="space-y-2.5">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder">
+                    <Layers className="w-3 h-3" />
+                    Hybrid Dense + BM25 Entity Search
+                  </span>
+                  <h3 className="font-serif font-bold text-xl sm:text-2xl text-nalar-text">
+                    Sintesis Proporsional Lintas Belasan Berkas
                   </h3>
-                  <p className="text-xs sm:text-sm text-nalar-muted leading-relaxed max-w-xl">
-                    Sintesis hingga belasan dokumen secara seimbang. Sistem RAG kami memastikan setiap dokumen sumber aktif mendapatkan porsi representasi yang proporsional tanpa ada berkas penting yang terlewatkan.
+                  <p className="text-xs sm:text-sm text-nalar-muted leading-relaxed">
+                    Menggabungkan pencarian vektor semantik dengan pencocokan nomor kontrak, pasal, dan angka eksak. Seluruh dokumen aktif dijamin terwakili secara adil tanpa ada berkas yang terlewat.
                   </p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-[#E5E0D5]/70 flex items-center justify-between text-xs text-nalar-muted">
-                  <span className="font-medium text-nalar-accent">Hingga 64 konteks chunk aktif</span>
-                  <span>Hybrid Vector + FTS RRF →</span>
+
+                {/* Visual Mini Pipeline */}
+                <div className="p-4 rounded-2xl bg-nalar-surface border border-nalar-border flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-nalar-card border border-nalar-border text-[11px] font-semibold text-nalar-text shadow-2xs">
+                      <FileText className="w-3.5 h-3.5 text-rose-500" /> PDF
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-nalar-card border border-nalar-border text-[11px] font-semibold text-nalar-text shadow-2xs">
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" /> XLSX
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-nalar-card border border-nalar-border text-[11px] font-semibold text-nalar-text shadow-2xs">
+                      <Globe className="w-3.5 h-3.5 text-blue-500" /> Drive
+                    </span>
+                  </div>
+
+                  <ArrowRight className="w-4 h-4 text-nalar-accent hidden sm:block shrink-0" />
+
+                  <div className="px-3 py-1.5 rounded-xl bg-nalar-accent text-white text-[11px] font-bold shadow-xs shrink-0">
+                    RRF Fusion (64 Chunks)
+                  </div>
+
+                  <ArrowRight className="w-4 h-4 text-nalar-accent hidden sm:block shrink-0" />
+
+                  <div className="px-3 py-1.5 rounded-xl bg-nalar-card border border-nalar-citationBorder text-[11px] font-semibold text-nalar-accent shrink-0">
+                    Sitasi [S1 · Hal. 4]
+                  </div>
                 </div>
               </div>
 
-              {/* Bento 2: Auto OCR Scan Fisik (md:col-span-1) */}
-              <div className="md:col-span-1 bg-white border border-[#E5E0D5] p-6 rounded-2xl flex flex-col justify-between shadow-2xs group hover:border-[#C25127] transition-all">
-                <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#F3EAE2] text-[#C25127] flex items-center justify-center">
-                    <ScanText className="w-5 h-5" />
-                  </div>
-                  <h3 className="font-serif font-bold text-base sm:text-lg text-nalar-text">
-                    Auto OCR Scan Fisik
+              {/* Bento 2 (5 Cols): Vision OCR Scan */}
+              <div className="md:col-span-5 floating-island rounded-3xl p-6 sm:p-8 flex flex-col justify-between gap-6 group hover:border-nalar-accent transition-all">
+                <div className="space-y-2.5">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder">
+                    <ScanText className="w-3 h-3" />
+                    Auto Vision OCR
+                  </span>
+                  <h3 className="font-serif font-bold text-xl text-nalar-text">
+                    Baca PDF Scan Fisik & Foto Dokumen
                   </h3>
                   <p className="text-xs text-nalar-muted leading-relaxed">
-                    Dokumen hasil scan foto atau lembaran fisik ditranskripsikan otomatis oleh Gemini Vision OCR ke teks terstruktur.
+                    Berkas kontrak lama hasil pemindaian mesin fotokopi otomatis dideteksi dan ditranskripsikan per halaman menggunakan Gemini Multimodal Vision.
                   </p>
                 </div>
-                <span className="text-xs font-semibold text-nalar-accent pt-4 border-t border-[#E5E0D5]/70 block">
-                  Presisi Teks Tinggi →
-                </span>
+
+                {/* Visual Scan Transformation Card */}
+                <div className="p-4 rounded-2xl bg-nalar-surface border border-nalar-border relative overflow-hidden space-y-2">
+                  <div className="flex items-center justify-between text-[10px] font-mono text-nalar-muted">
+                    <span>SCAN_BERITA_ACARA.PDF</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold">OCR AKTIF</span>
+                  </div>
+                  <div className="h-1.5 w-3/4 rounded bg-nalar-border/80" />
+                  <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-nalar-accent to-transparent my-1" />
+                  <p className="font-mono text-[11px] text-nalar-text bg-nalar-card p-2 rounded-lg border border-nalar-border">
+                    --- HALAMAN 1 --- Pasal 4: Jangka waktu pemeliharaan ditetapkan 12 bulan...
+                  </p>
+                </div>
               </div>
 
-              {/* Bento 3: Ekspor Word (.docx) & Studio (md:col-span-1) */}
-              <div className="md:col-span-1 bg-white border border-[#E5E0D5] p-6 rounded-2xl flex flex-col justify-between shadow-2xs group hover:border-[#C25127] transition-all">
-                <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#F3EAE2] text-[#C25127] flex items-center justify-center">
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <h3 className="font-serif font-bold text-base sm:text-lg text-nalar-text">
-                    Ekspor Word (.docx) Instan
+              {/* Bento 3 (5 Cols): Studio 8 Formats + Podcast Waveform */}
+              <div className="md:col-span-5 floating-island rounded-3xl p-6 sm:p-8 flex flex-col justify-between gap-6 group hover:border-nalar-accent transition-all">
+                <div className="space-y-2.5">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder">
+                    <Radio className="w-3 h-3" />
+                    Studio 8 Format & Audio
+                  </span>
+                  <h3 className="font-serif font-bold text-xl text-nalar-text">
+                    AI Podcast 2 Pembicara & Laporan 1-Klik
                   </h3>
                   <p className="text-xs text-nalar-muted leading-relaxed">
-                    Ubah rangkuman eksekutif, tabel komparasi, atau jawaban chat menjadi file Microsoft Word rapi dalam 1 klik.
+                    Ubah dokumen tebal menjadi obrolan audio interaktif antara Host & Analis, atau hasilkan Briefing Eksekutif, FAQ, Linimasa, dan Action Items.
                   </p>
                 </div>
-                <span className="text-xs font-semibold text-nalar-accent pt-4 border-t border-[#E5E0D5]/70 block">
-                  Format Dokumen Standar →
-                </span>
+
+                {/* Mini Equalizer Card */}
+                <div className="p-3.5 rounded-2xl bg-nalar-surface border border-nalar-border flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-nalar-accent text-white flex items-center justify-center font-bold text-[11px]">
+                      M&B
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-nalar-text">Maya & Budi</p>
+                      <p className="text-[10px] text-nalar-muted">Transkrip Karaoke Live</p>
+                    </div>
+                  </div>
+                  <div className="flex items-end gap-1 h-6" aria-hidden="true">
+                    {[50, 95, 65, 100, 45, 80, 90, 55, 75, 40].map((h, idx) => (
+                      <span
+                        key={idx}
+                        style={{ height: `${h}%`, animationDelay: `${idx * 0.1}s` }}
+                        className="w-1 rounded-full bg-nalar-accent animate-waveform"
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              {/* Bento 4: In-App Split Viewer & Sitasi Presisi (Large: md:col-span-2) */}
-              <div className="md:col-span-2 bg-white border border-[#E5E0D5] p-6 sm:p-8 rounded-2xl flex flex-col justify-between shadow-2xs group hover:border-[#C25127] transition-all">
-                <div className="space-y-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#F3EAE2] text-[#C25127] flex items-center justify-center">
-                    <Bookmark className="w-5 h-5" />
-                  </div>
-                  <h3 className="font-serif font-bold text-lg sm:text-xl text-nalar-text">
-                    In-App Split Viewer & Smart Citation Highlight
+              {/* Bento 4 (7 Cols): Word DOCX Export with Real Tables */}
+              <div className="md:col-span-7 floating-island rounded-3xl p-6 sm:p-8 flex flex-col justify-between gap-6 group hover:border-nalar-accent transition-all">
+                <div className="space-y-2.5">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder">
+                    <FileText className="w-3 h-3" />
+                    Native Word (.docx) Generator
+                  </span>
+                  <h3 className="font-serif font-bold text-xl sm:text-2xl text-nalar-text">
+                    Ekspor Laporan & Tabel Komparasi ke Microsoft Word
                   </h3>
-                  <p className="text-xs sm:text-sm text-nalar-muted leading-relaxed max-w-xl">
-                    Periksa kebenaran jawaban AI secara berdampingan tanpa perlu membuka aplikasi terpisah. Klik sitasi [S#] dan dokumen PDF akan melompat langsung ke halaman yang bersangkutan dengan kutipan kalimat tersorot.
+                  <p className="text-xs sm:text-sm text-nalar-muted leading-relaxed">
+                    Tidak perlu merapikan ulang format secara manual. Heading, daftar poin, hingga tabel perbandingan multi-dokumen langsung terkonversi menjadi tabel Word asli yang siap dipresentasikan.
                   </p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-[#E5E0D5]/70 flex items-center justify-between text-xs text-nalar-muted">
-                  <span className="font-medium text-nalar-accent">Zero Hallucination Proof</span>
-                  <span>Interactive Split View 50% →</span>
-                </div>
-              </div>
 
-              {/* Bento 5: Matriks Komparasi & Audio Overview (md:col-span-3) */}
-              <div className="md:col-span-3 bg-white border border-[#E5E0D5] p-6 sm:p-7 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs group hover:border-[#C25127] transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#F3EAE2] text-[#C25127] flex items-center justify-center shrink-0">
-                    <Radio className="w-5 h-5" />
+                {/* Mini Word Document Sheet Preview */}
+                <div className="p-4 rounded-2xl bg-nalar-surface border border-nalar-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="space-y-1.5 flex-1 w-full">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-blue-600 text-white text-[10px] font-bold">
+                        DOCX
+                      </span>
+                      <span className="font-serif font-bold text-xs text-nalar-text">
+                        Matriks-Komparasi-Vendor-2026.docx
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5 pt-1 text-[10px]">
+                      <div className="p-1.5 rounded bg-nalar-citationBg text-nalar-accent font-semibold border border-nalar-citationBorder">
+                        Aspek Kontrak
+                      </div>
+                      <div className="p-1.5 rounded bg-nalar-card border border-nalar-border text-nalar-muted">
+                        Vendor A: 90 Hari
+                      </div>
+                      <div className="p-1.5 rounded bg-nalar-card border border-nalar-border text-nalar-muted">
+                        Vendor B: 60 Hari
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-serif font-bold text-base sm:text-lg text-nalar-text">
-                      Matriks Komparasi Dokumen & Audio Overview AI Podcast
-                    </h3>
-                    <p className="text-xs text-nalar-muted mt-0.5">
-                      Bandingkan 2+ kontrak secara berdampingan dalam tabel aspek, atau dengarkan pembahasan dokumen via audio obrolan 2 karakter.
-                    </p>
-                  </div>
+                  <Link
+                    href="/signup"
+                    className="px-4 py-2 rounded-xl bg-nalar-accent text-white text-xs font-semibold hover:bg-nalar-accentHover transition shrink-0 shadow-xs"
+                  >
+                    Coba Ekspor →
+                  </Link>
                 </div>
-                <Link
-                  href="/signup"
-                  className="px-4 py-2 rounded-xl bg-nalar-accent text-white text-xs font-semibold hover:bg-nalar-accentHover transition shrink-0 shadow-xs"
-                >
-                  Coba Sekarang
-                </Link>
               </div>
             </div>
           </div>
         </section>
 
         {/* 3 Step Workflow */}
-        <section className="py-20 bg-nalar-bg relative">
+        <section id="alur-kerja" className="py-20 bg-nalar-bg relative">
           <div className="container mx-auto px-4 sm:px-6 max-w-5xl text-center">
+            <span className="text-xs font-bold uppercase tracking-widest text-nalar-accent mb-2 block">
+              Alur Kerja Efisien
+            </span>
             <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight mb-3 text-nalar-text">
-              Cara Kerja Sederhana dalam 3 Langkah
+              Dari Tumpukan Berkas ke Keputusan Tajam dalam 3 Langkah
             </h2>
             <p className="text-xs sm:text-sm text-nalar-muted mb-12 max-w-xl mx-auto">
-              Langsung bekerja tanpa setup yang rumit.
+              Tanpa konfigurasi rumit. Setiap ruang notebook terisolasi aman untuk masing-masing proyek Anda.
             </p>
 
-            <div className="grid md:grid-cols-3 gap-6 text-left">
-              <div className="p-6 rounded-2xl bg-white border border-[#E5E0D5] shadow-2xs relative">
-                <span className="w-7 h-7 rounded-full bg-[#F3EAE2] text-[#A6421D] font-bold flex items-center justify-center text-xs mb-3 border border-[#DFC9B8]">
-                  1
-                </span>
-                <h3 className="font-serif font-bold text-base mb-1.5 text-nalar-text">Unggah Dokumen</h3>
-                <p className="text-xs text-nalar-muted leading-relaxed">
-                  Drag and drop berkas PDF, Word, Excel, CSV, atau masukkan tautan Google Drive ke notebook Anda.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-2xl bg-white border border-[#E5E0D5] shadow-2xs relative">
-                <span className="w-7 h-7 rounded-full bg-[#F3EAE2] text-[#A6421D] font-bold flex items-center justify-center text-xs mb-3 border border-[#DFC9B8]">
-                  2
-                </span>
-                <h3 className="font-serif font-bold text-base mb-1.5 text-nalar-text">Tanya & Analisis</h3>
-                <p className="text-xs text-nalar-muted leading-relaxed">
-                  Ajukan pertanyaan spesifik atau minta AI merangkum dan membandingkan dokumen. Riwayat percakapan tersimpan permanen.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-2xl bg-white border border-[#E5E0D5] shadow-2xs relative">
-                <span className="w-7 h-7 rounded-full bg-[#F3EAE2] text-[#A6421D] font-bold flex items-center justify-center text-xs mb-3 border border-[#DFC9B8]">
-                  3
-                </span>
-                <h3 className="font-serif font-bold text-base mb-1.5 text-nalar-text">Ekspor Word & Bagikan</h3>
-                <p className="text-xs text-nalar-muted leading-relaxed">
-                  Unduh hasil sintesis langsung ke format Microsoft Word (.docx) atau bagikan notebook melalui link publik.
-                </p>
-              </div>
+            <div className="grid md:grid-cols-3 gap-5 text-left">
+              {[
+                {
+                  num: '01',
+                  title: 'Unggah Berkas atau Tautan',
+                  desc: 'Tarik berkas PDF, Word, Excel, CSV, atau tempel tautan Google Drive & halaman web ke dalam notebook proyek.',
+                },
+                {
+                  num: '02',
+                  title: 'Tanya AI & Inspeksi Sitasi',
+                  desc: 'Ajukan pertanyaan spesifik. Klik sitasi [S#] untuk melompat langsung ke halaman PDF asli beserta sorotan kalimat.',
+                },
+                {
+                  num: '03',
+                  title: 'Sintesis Studio & Unduh .docx',
+                  desc: 'Hasilkan 8 format laporan eksekutif, matriks perbandingan, atau dengarkan podcast diskusi lalu bagikan tautan baca.',
+                },
+              ].map((step) => (
+                <div
+                  key={step.num}
+                  className="p-6 rounded-2xl floating-island flex flex-col justify-between gap-4 hover:border-nalar-accent/60 transition-colors"
+                >
+                  <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder w-fit">
+                    LANGKAH {step.num}
+                  </span>
+                  <div>
+                    <h3 className="font-serif font-bold text-base sm:text-lg mb-1.5 text-nalar-text">
+                      {step.title}
+                    </h3>
+                    <p className="text-xs text-nalar-muted leading-relaxed">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Bottom Callout Banner */}
-        <section className="py-16 px-4 bg-[#F3F0EA] border-t border-[#E5E0D5]">
+        <section className="py-16 px-4 bg-nalar-surface/80 border-t border-nalar-border">
           <div className="container mx-auto max-w-4xl">
-            <div className="bg-white rounded-3xl p-8 sm:p-12 text-center border border-[#E5E0D5] shadow-sm relative overflow-hidden">
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight mb-3 text-nalar-text">
-                Siap Meningkatkan Produktivitas Riset Anda?
-              </h2>
-              <p className="text-xs sm:text-sm text-nalar-muted max-w-lg mx-auto mb-7 leading-relaxed">
-                Tinggalkan cara manual membaca ratusan halaman dokumen. Biarkan Nalar menyintesis fakta penting dengan kutipan asli terverifikasi.
-              </p>
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-2 bg-nalar-accent text-white font-semibold px-7 py-3 rounded-xl shadow-xs hover:bg-nalar-accentHover transition-all text-xs sm:text-sm"
-              >
-                Mulai Riset Sekarang Gratis
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+            <div className="floating-island rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
+              <div className="absolute inset-0 ambient-mesh pointer-events-none" aria-hidden="true" />
+              <div className="relative z-10">
+                <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 text-nalar-text">
+                  Siap Mengubah Cara Anda Menelaah Dokumen?
+                </h2>
+                <p className="text-xs sm:text-sm text-nalar-muted max-w-lg mx-auto mb-7 leading-relaxed">
+                  Mulai ruang riset pribadi Anda sekarang. Gratis, terenkripsi dengan isolasi multi-tenant, dan siap mengekspor laporan dalam hitungan detik.
+                </p>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center gap-2 bg-nalar-accent text-white font-semibold px-7 py-3 rounded-xl shadow-xs hover:bg-nalar-accentHover transition-all text-xs sm:text-sm"
+                >
+                  Mulai Riset Sekarang Gratis
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
           </div>
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-[#E5E0D5] bg-white py-8 text-xs text-nalar-muted relative z-10">
-        <div className="container mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <footer className="border-t border-nalar-border bg-nalar-card py-8 text-xs text-nalar-muted relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Image
               src="/logo-icon.png"
@@ -420,7 +403,7 @@ export default function HomePage() {
 
           <div className="flex items-center gap-2 text-[11px] text-nalar-muted">
             <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>Sistem Berjalan Normal</span>
+            <span>Seluruh Sistem Operasional</span>
           </div>
         </div>
       </footer>

@@ -4,7 +4,16 @@ export const dynamic = 'force-dynamic';
 
 import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, BookOpen, Layers, Loader2, MessageSquare, Sparkles, Share2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  Layers,
+  Loader2,
+  MessageSquare,
+  Sparkles,
+  Share2,
+  PanelLeftClose,
+  PanelLeftOpen,
+} from 'lucide-react';
 import { Source, Citation } from '@/lib/types';
 import { UploadDropzone } from '@/components/sources/upload-dropzone';
 import { SourceList } from '@/components/sources/source-list';
@@ -12,6 +21,7 @@ import { ChatPanel } from '@/components/chat/chat-panel';
 import { SourceViewer } from '@/components/sources/source-viewer';
 import { ArtifactStudio } from '@/components/artifacts/artifact-studio';
 import { ShareModal } from '@/components/notebooks/share-modal';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export default function NotebookDetailPage({
   params,
@@ -25,10 +35,9 @@ export default function NotebookDetailPage({
   const [loading, setLoading] = useState(true);
   const [shareModalOpen, setShareModalOpen] = useState(false);
 
-  // Active view: 'chat' | 'studio' | 'sources' (on mobile)
   const [activeView, setActiveView] = useState<'chat' | 'studio' | 'sources'>('chat');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // Source viewer state
   const [activeCitation, setActiveCitation] = useState<Citation | null>(null);
   const [selectedSourceId, setSelectedSourceId] = useState<string | null>(null);
 
@@ -55,8 +64,8 @@ export default function NotebookDetailPage({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full py-24 text-muted-foreground">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="flex items-center justify-center h-full py-24 text-nalar-muted">
+        <Loader2 className="w-8 h-8 animate-spin text-nalar-accent" />
       </div>
     );
   }
@@ -64,8 +73,8 @@ export default function NotebookDetailPage({
   if (!notebook) {
     return (
       <div className="p-8 text-center space-y-4">
-        <h2 className="text-xl font-bold">Notebook Tidak Ditemukan</h2>
-        <Link href="/notebooks" className="text-primary hover:underline text-sm">
+        <h2 className="text-xl font-serif font-bold text-nalar-text">Notebook Tidak Ditemukan</h2>
+        <Link href="/notebooks" className="text-nalar-accent hover:underline text-sm">
           Kembali ke daftar notebook
         </Link>
       </div>
@@ -73,22 +82,39 @@ export default function NotebookDetailPage({
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-nalar-bg text-nalar-text">
-      {/* Top Header */}
-      <header className="h-14 border-b border-[#E5E0D5] bg-[#FAF8F5]/90 backdrop-blur-md px-3 sm:px-4 flex items-center justify-between shrink-0 z-10">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+    <div className="flex flex-col h-screen overflow-hidden bg-nalar-bg text-nalar-text md:p-2.5 md:gap-2.5">
+      {/* Floating Island Top Header */}
+      <header className="h-14 md:rounded-2xl border-b md:border border-nalar-border bg-nalar-card/90 backdrop-blur-md px-3 sm:px-4 flex items-center justify-between shrink-0 z-20 shadow-2xs">
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
           <Link
             href="/notebooks"
-            className="p-1.5 rounded-lg text-nalar-muted hover:text-nalar-text hover:bg-[#F3F0EA] transition shrink-0"
-            title="Kembali ke Daftar Notebook"
+            className="p-1.5 rounded-xl text-nalar-muted hover:text-nalar-text hover:bg-nalar-surface transition shrink-0"
+            title="Kembali ke Koleksi Notebook"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
+
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="hidden md:inline-flex p-1.5 rounded-xl text-nalar-muted hover:text-nalar-text hover:bg-nalar-surface transition shrink-0 cursor-pointer"
+            title={sidebarCollapsed ? 'Tampilkan Panel Sumber' : 'Sembunyikan Panel Sumber'}
+          >
+            {sidebarCollapsed ? (
+              <PanelLeftOpen className="w-4 h-4" />
+            ) : (
+              <PanelLeftClose className="w-4 h-4" />
+            )}
+          </button>
+
+          <div className="h-4 w-px bg-nalar-border hidden sm:block shrink-0" />
+
           <div className="flex items-center gap-2 min-w-0">
-            <h1 className="font-serif font-bold text-xs sm:text-sm tracking-tight truncate max-w-[140px] sm:max-w-xs md:max-w-md text-nalar-text">
+            <h1 className="font-serif font-bold text-xs sm:text-sm md:text-base tracking-tight truncate max-w-[140px] sm:max-w-xs md:max-w-md text-nalar-text">
               {notebook.title}
             </h1>
-            <span className="hidden sm:inline-flex text-[11px] px-2 py-0.5 rounded-full bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8]/70 font-medium shrink-0">
+            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] px-2.5 py-0.5 rounded-full bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder font-semibold shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               {readySources.length} sumber aktif
             </span>
           </div>
@@ -97,12 +123,13 @@ export default function NotebookDetailPage({
         {/* Action Controls & View Switcher */}
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Desktop View Switcher (Chat vs Studio) */}
-          <div className="hidden md:flex items-center bg-[#F3F0EA] p-1 rounded-xl border border-[#E5E0D5] text-xs">
+          <div className="hidden md:flex items-center bg-nalar-surface p-1 rounded-xl border border-nalar-border text-xs">
             <button
+              type="button"
               onClick={() => setActiveView('chat')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
                 activeView === 'chat'
-                  ? 'bg-white text-nalar-text shadow-2xs font-semibold'
+                  ? 'bg-nalar-card text-nalar-text shadow-2xs font-semibold'
                   : 'text-nalar-muted hover:text-nalar-text'
               }`}
             >
@@ -110,35 +137,40 @@ export default function NotebookDetailPage({
               <span>Chat AI</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveView('studio')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all cursor-pointer ${
                 activeView === 'studio'
-                  ? 'bg-white text-nalar-text shadow-2xs font-semibold'
+                  ? 'bg-nalar-card text-nalar-text shadow-2xs font-semibold'
                   : 'text-nalar-muted hover:text-nalar-text'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <span>Studio Dokumen</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Studio Sintesis</span>
             </button>
           </div>
 
+          <ThemeToggle compact />
+
           {/* Share Button */}
           <button
+            type="button"
             onClick={() => setShareModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#E5E0D5] bg-white hover:bg-[#F3F0EA] text-xs font-medium text-nalar-text transition-colors shadow-2xs cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-nalar-border bg-nalar-card hover:bg-nalar-surface text-xs font-medium text-nalar-text transition-colors shadow-2xs cursor-pointer"
             title="Bagikan Notebook"
           >
             <Share2 className="w-3.5 h-3.5 text-nalar-accent" />
             <span className="hidden sm:inline">Bagikan</span>
           </button>
 
-          {/* Mobile Tab Switcher (Chat vs Studio vs Sumber) */}
-          <div className="flex md:hidden items-center bg-[#F3F0EA] p-0.5 rounded-xl border border-[#E5E0D5] text-[11px]">
+          {/* Mobile Tab Switcher */}
+          <div className="flex md:hidden items-center bg-nalar-surface p-0.5 rounded-xl border border-nalar-border text-[11px]">
             <button
+              type="button"
               onClick={() => setActiveView('chat')}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-lg font-medium transition-all ${
                 activeView === 'chat'
-                  ? 'bg-white text-nalar-text shadow-2xs font-bold'
+                  ? 'bg-nalar-card text-nalar-text shadow-2xs font-bold'
                   : 'text-nalar-muted'
               }`}
             >
@@ -146,21 +178,23 @@ export default function NotebookDetailPage({
               <span>Chat</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveView('studio')}
               className={`flex items-center gap-1 px-2 py-1 rounded-lg font-medium transition-all ${
                 activeView === 'studio'
-                  ? 'bg-white text-nalar-text shadow-2xs font-bold'
+                  ? 'bg-nalar-card text-nalar-text shadow-2xs font-bold'
                   : 'text-nalar-muted'
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>Studio</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveView('sources')}
               className={`flex items-center gap-1 px-2 py-1 rounded-lg font-medium transition-all ${
                 activeView === 'sources'
-                  ? 'bg-white text-nalar-text shadow-2xs font-bold'
+                  ? 'bg-nalar-card text-nalar-text shadow-2xs font-bold'
                   : 'text-nalar-muted'
               }`}
             >
@@ -171,20 +205,22 @@ export default function NotebookDetailPage({
         </div>
       </header>
 
-      {/* Main Work Area */}
-      <div className="flex-1 flex min-h-0 relative overflow-hidden">
-        {/* Sources Panel */}
+      {/* Main Floating Islands Workspace */}
+      <div className="flex-1 flex min-h-0 relative overflow-hidden md:gap-2.5">
+        {/* Left Island: Sources Panel */}
         <div
           className={`${
             activeView === 'sources' ? 'flex w-full' : 'hidden'
-          } md:flex md:w-72 lg:w-80 border-r border-[#E5E0D5] bg-[#F3F0EA] flex-col h-full shrink-0 overflow-hidden`}
+          } ${
+            sidebarCollapsed ? 'md:hidden' : 'md:flex md:w-72 lg:w-80'
+          } md:rounded-2xl floating-island flex-col h-full shrink-0 overflow-hidden transition-all`}
         >
-          <div className="p-3.5 border-b border-[#E5E0D5] flex items-center justify-between shrink-0 bg-[#F3F0EA]">
+          <div className="p-3.5 border-b border-nalar-border flex items-center justify-between shrink-0 bg-nalar-surface/50">
             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-nalar-muted">
               <Layers className="w-4 h-4 text-nalar-accent" />
               <span>Sumber Dokumen</span>
             </div>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-white border border-[#E5E0D5] text-nalar-text">
+            <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full bg-nalar-card border border-nalar-border text-nalar-text">
               {sources.length}
             </span>
           </div>
@@ -211,8 +247,12 @@ export default function NotebookDetailPage({
           </div>
         </div>
 
-        {/* Center Workspace (Chat or Studio) */}
-        <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
+        {/* Center Island: Chat or Studio */}
+        <div
+          className={`${
+            activeView === 'sources' ? 'hidden md:flex' : 'flex'
+          } flex-1 flex-col h-full min-w-0 overflow-hidden md:rounded-2xl floating-island`}
+        >
           {activeView === 'studio' ? (
             <ArtifactStudio
               notebookId={notebookId}
@@ -220,24 +260,18 @@ export default function NotebookDetailPage({
               sources={sources}
             />
           ) : (
-            <div
-              className={`${
-                activeView === 'chat' ? 'flex' : 'hidden md:flex'
-              } flex-1 flex-col h-full min-w-0 overflow-hidden`}
-            >
-              <ChatPanel
-                notebookId={notebookId}
-                readySourceCount={readySources.length}
-                onCitationClick={(cit) => {
-                  setActiveCitation(cit);
-                  setSelectedSourceId(cit.sourceId);
-                }}
-              />
-            </div>
+            <ChatPanel
+              notebookId={notebookId}
+              readySourceCount={readySources.length}
+              onCitationClick={(cit) => {
+                setActiveCitation(cit);
+                setSelectedSourceId(cit.sourceId);
+              }}
+            />
           )}
         </div>
 
-        {/* Source Viewer Drawer (Responsive Slide-over) */}
+        {/* Right Island: Source Viewer Split Panel */}
         {(selectedSourceId || activeCitation) && (
           <SourceViewer
             sourceId={selectedSourceId}

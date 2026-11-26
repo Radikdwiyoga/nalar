@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Loader2, AlertCircle, CheckCircle2, Sparkles, ShieldCheck, Layers } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -79,20 +80,23 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-nalar-bg text-nalar-text">
       {/* Left Column (5 Cols) - Form & Brand */}
-      <div className="lg:col-span-5 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-white border-r border-[#E5E0D5]">
-        <Link href="/" className="inline-flex items-center gap-2.5 group w-fit">
-          <div className="p-1 rounded-xl bg-[#F3EAE2] border border-[#DFC9B8]/60 group-hover:scale-105 transition-transform">
-            <Image
-              src="/logo-icon.png"
-              alt="Nalar Logo"
-              width={28}
-              height={28}
-              className="w-7 h-7 object-contain"
-              priority
-            />
-          </div>
-          <span className="font-serif font-bold text-lg text-nalar-text tracking-tight">Nalar</span>
-        </Link>
+      <div className="lg:col-span-5 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-nalar-card border-r border-nalar-border">
+        <div className="flex items-center justify-between">
+          <Link href="/" className="inline-flex items-center gap-2.5 group w-fit">
+            <div className="p-1 rounded-xl bg-nalar-citationBg border border-nalar-citationBorder group-hover:scale-105 transition-transform">
+              <Image
+                src="/logo-icon.png"
+                alt="Nalar Logo"
+                width={28}
+                height={28}
+                className="w-7 h-7 object-contain"
+                priority
+              />
+            </div>
+            <span className="font-serif font-bold text-lg text-nalar-text tracking-tight">Nalar</span>
+          </Link>
+          <ThemeToggle compact />
+        </div>
 
         <div className="py-8 my-auto w-full max-w-sm mx-auto space-y-6">
           <div className="space-y-1.5">
@@ -112,8 +116,8 @@ export default function SignupPage() {
           )}
 
           {success ? (
-            <div className="text-center space-y-4 py-6 px-4 rounded-2xl border border-[#E5E0D5] bg-[#FAF8F5]">
-              <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 mx-auto flex items-center justify-center">
+            <div className="text-center space-y-4 py-6 px-4 rounded-2xl border border-nalar-border bg-nalar-bg">
+              <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 mx-auto flex items-center justify-center">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <h3 className="font-serif font-bold text-base text-nalar-text">Cek Email Anda</h3>
@@ -133,7 +137,7 @@ export default function SignupPage() {
                 type="button"
                 onClick={handleGoogleSignup}
                 disabled={googleLoading || loading}
-                className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl border border-[#E5E0D5] bg-white hover:bg-[#F3F0EA] text-xs font-semibold text-nalar-text transition-all shadow-2xs cursor-pointer disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl border border-nalar-border bg-nalar-card hover:bg-nalar-surface text-xs font-semibold text-nalar-text transition-all shadow-2xs cursor-pointer disabled:opacity-50"
               >
                 {googleLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin text-nalar-accent" />
@@ -161,8 +165,8 @@ export default function SignupPage() {
               </button>
 
               <div className="relative flex items-center justify-center">
-                <div className="border-t border-[#E5E0D5] w-full" />
-                <span className="bg-white px-3 text-[11px] uppercase tracking-wider text-nalar-muted font-medium absolute">
+                <div className="border-t border-nalar-border w-full" />
+                <span className="bg-nalar-card px-3 text-[11px] uppercase tracking-wider text-nalar-muted font-medium absolute">
                   atau dengan email
                 </span>
               </div>
@@ -175,11 +179,12 @@ export default function SignupPage() {
                   <input
                     id="fullName"
                     type="text"
+                    autoComplete="name"
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Nama lengkap Anda"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E0D5] bg-white text-xs text-nalar-text focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent transition-all shadow-2xs"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-nalar-border bg-nalar-bg text-xs text-nalar-text focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent transition-all shadow-2xs"
                   />
                 </div>
 
@@ -190,11 +195,12 @@ export default function SignupPage() {
                   <input
                     id="email"
                     type="email"
+                    autoComplete="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="nama@email.com"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E0D5] bg-white text-xs text-nalar-text focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent transition-all shadow-2xs"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-nalar-border bg-nalar-bg text-xs text-nalar-text focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent transition-all shadow-2xs"
                   />
                 </div>
 
@@ -205,11 +211,12 @@ export default function SignupPage() {
                   <input
                     id="password"
                     type="password"
+                    autoComplete="new-password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimal 6 karakter"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E0D5] bg-white text-xs text-nalar-text focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent transition-all shadow-2xs"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-nalar-border bg-nalar-bg text-xs text-nalar-text focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent transition-all shadow-2xs"
                   />
                 </div>
 
@@ -232,7 +239,7 @@ export default function SignupPage() {
           )}
         </div>
 
-        <div className="text-[11px] text-nalar-muted pt-4 border-t border-[#E5E0D5]/60 flex items-center justify-between">
+        <div className="text-[11px] text-nalar-muted pt-4 border-t border-nalar-border/60 flex items-center justify-between">
           <span>© 2026 Nalar — AI Document Synthesis</span>
           <Link href="/" className="hover:text-nalar-text transition">
             Kembali ke Beranda
@@ -241,7 +248,9 @@ export default function SignupPage() {
       </div>
 
       {/* Right Column (7 Cols) - Editorial Highlights */}
-      <div className="hidden lg:flex lg:col-span-7 flex-col justify-center p-12 xl:p-16 bg-[#F3F0EA] relative overflow-hidden">
+      <div className="hidden lg:flex lg:col-span-7 flex-col justify-center p-12 xl:p-16 bg-nalar-surface relative overflow-hidden">
+        <div className="absolute inset-0 editorial-grid-fade opacity-70 pointer-events-none" aria-hidden="true" />
+        <div className="absolute inset-0 ambient-mesh pointer-events-none" aria-hidden="true" />
         <div className="max-w-xl mx-auto space-y-8 relative z-10">
           <div className="space-y-3">
             <span className="text-[11px] font-bold uppercase tracking-widest text-nalar-accent">
@@ -256,8 +265,8 @@ export default function SignupPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-3.5">
-            <div className="bg-white p-4 rounded-2xl border border-[#E5E0D5] shadow-2xs flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-[#F3EAE2] text-[#C25127] flex items-center justify-center shrink-0 border border-[#DFC9B8]">
+            <div className="floating-island p-4 rounded-2xl flex items-start gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-nalar-citationBg text-nalar-accent flex items-center justify-center shrink-0 border border-nalar-citationBorder">
                 <Layers className="w-4 h-4" />
               </div>
               <div>
@@ -268,8 +277,8 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-2xl border border-[#E5E0D5] shadow-2xs flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-[#F3EAE2] text-[#C25127] flex items-center justify-center shrink-0 border border-[#DFC9B8]">
+            <div className="floating-island p-4 rounded-2xl flex items-start gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-nalar-citationBg text-nalar-accent flex items-center justify-center shrink-0 border border-nalar-citationBorder">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
@@ -280,8 +289,8 @@ export default function SignupPage() {
               </div>
             </div>
 
-            <div className="bg-white p-4 rounded-2xl border border-[#E5E0D5] shadow-2xs flex items-start gap-3.5">
-              <div className="w-9 h-9 rounded-xl bg-[#F3EAE2] text-[#C25127] flex items-center justify-center shrink-0 border border-[#DFC9B8]">
+            <div className="floating-island p-4 rounded-2xl flex items-start gap-3.5">
+              <div className="w-9 h-9 rounded-xl bg-nalar-citationBg text-nalar-accent flex items-center justify-center shrink-0 border border-nalar-citationBorder">
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <div>

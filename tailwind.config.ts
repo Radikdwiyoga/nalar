@@ -16,16 +16,16 @@ export default {
       },
       colors: {
         nalar: {
-          bg: '#FAF8F5',        // Warm Alabaster / Paper
-          surface: '#F3F0EA',   // Soft Warm Gray / Cream
-          card: '#FFFFFF',      // Pure White Card
-          border: '#E5E0D5',    // Warm Stone Border
-          text: '#1C1B18',      // Deep Charcoal
-          muted: '#6E6A61',     // Warm Muted Gray
-          accent: '#C25127',    // Deep Terracotta / Burnt Amber
-          accentHover: '#A6421D',
-          citationBg: '#F3EAE2',
-          citationBorder: '#DFC9B8',
+          bg: 'var(--nalar-bg)',
+          surface: 'var(--nalar-surface)',
+          card: 'var(--nalar-card)',
+          border: 'var(--nalar-border)',
+          text: 'var(--nalar-text)',
+          muted: 'var(--nalar-muted)',
+          accent: 'var(--nalar-accent)',
+          accentHover: 'var(--nalar-accent-hover)',
+          citationBg: 'var(--nalar-citation-bg)',
+          citationBorder: 'var(--nalar-citation-border)',
         },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

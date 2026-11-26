@@ -55,9 +55,9 @@ const FEATURED_OPTIONS: GeneratorOption[] = [
     title: 'Audio Overview (AI Podcast)',
     desc: 'Obrolan podcast interaktif 2 pembicara (Host & Analis) yang membahas intisari dokumen dengan suara alami.',
     icon: Radio,
-    color: 'text-[#C25127] bg-[#F3EAE2] border-[#DFC9B8]',
+    color: 'text-nalar-accent bg-nalar-citationBg border-nalar-citationBorder',
     badge: 'Dual Speaker TTS',
-    badgeColor: 'bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8]',
+    badgeColor: 'bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder',
   },
 ];
 
@@ -208,7 +208,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
       {/* Studio Header */}
       <div className="space-y-1">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-[#F3EAE2] text-[#C25127] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder flex items-center justify-center">
             <Sparkles className="w-4 h-4" />
           </div>
           <h2 className="text-xl sm:text-2xl font-serif font-bold tracking-tight text-nalar-text">Studio & Dokumen Sintesis</h2>
@@ -229,7 +229,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#C25127]" />
+            <span className="w-2 h-2 rounded-full bg-nalar-accent" />
             <h3 className="text-xs font-bold uppercase tracking-wider text-nalar-text">
               Fitur Interaktif & Lanjutan
             </h3>
@@ -251,7 +251,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                     handleGenerate(opt.kind);
                   }
                 }}
-                className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-2xl border border-[#E5E0D5] bg-white hover:border-[#C25127] hover:shadow-md transition-all duration-200 cursor-pointer min-h-[160px] ${
+                className={`group relative flex flex-col justify-between p-5 sm:p-6 rounded-2xl border border-nalar-border bg-nalar-bg/60 hover:bg-nalar-surface/60 hover:border-nalar-accent hover:shadow-md transition-all duration-200 cursor-pointer min-h-[160px] ${
                   isAnyGenerating || readySourceCount === 0 ? 'opacity-60 cursor-not-allowed' : ''
                 }`}
               >
@@ -262,7 +262,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                     </div>
                     <div className="flex items-center gap-2">
                       {isGeneratingThis ? (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C25127] animate-pulse">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-nalar-accent animate-pulse">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           Memproses...
                         </span>
@@ -275,7 +275,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                   </div>
 
                   <div>
-                    <h4 className="font-serif font-bold text-base text-nalar-text group-hover:text-[#C25127] transition-colors">
+                    <h4 className="font-serif font-bold text-base text-nalar-text group-hover:text-nalar-accent transition-colors">
                       {opt.title}
                     </h4>
                     <p className="text-xs sm:text-sm text-nalar-muted leading-relaxed mt-1">
@@ -284,7 +284,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                   </div>
                 </div>
 
-                <div className="pt-3.5 mt-4 border-t border-[#E5E0D5]/70 flex items-center justify-between text-xs font-semibold text-nalar-muted group-hover:text-[#C25127] transition-colors">
+                <div className="pt-3.5 mt-4 border-t border-nalar-border/70 flex items-center justify-between text-xs font-semibold text-nalar-muted group-hover:text-nalar-accent transition-colors">
                   <span>{opt.kind === 'comparison' ? 'Buka Matriks Komparasi' : 'Putar Audio Podcast'}</span>
                   <span className="transform group-hover:translate-x-1 transition-transform">→</span>
                 </div>
@@ -298,7 +298,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
       <div className="space-y-3 pt-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#3D3A37]" />
+            <span className="w-2 h-2 rounded-full bg-nalar-muted" />
             <h3 className="text-xs font-bold uppercase tracking-wider text-nalar-text">
               Dokumen Sintesis & Laporan
             </h3>
@@ -320,7 +320,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                     handleGenerate(opt.kind);
                   }
                 }}
-                className={`group relative flex flex-col justify-between p-5 rounded-2xl border border-[#E5E0D5] bg-white hover:border-[#C25127] hover:shadow-md transition-all duration-200 cursor-pointer min-h-[175px] ${
+                className={`group relative flex flex-col justify-between p-5 rounded-2xl border border-nalar-border bg-nalar-bg/60 hover:bg-nalar-surface/60 hover:border-nalar-accent hover:shadow-md transition-all duration-200 cursor-pointer min-h-[175px] ${
                   isAnyGenerating || readySourceCount === 0 ? 'opacity-60 cursor-not-allowed' : ''
                 }`}
               >
@@ -330,7 +330,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                       <Icon className="w-4 h-4" />
                     </div>
                     {isGeneratingThis ? (
-                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#C25127] animate-pulse">
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-nalar-accent animate-pulse">
                         <Loader2 className="w-3 h-3 animate-spin" />
                         Menyusun...
                       </span>
@@ -342,7 +342,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                   </div>
 
                   <div>
-                    <h4 className="font-serif font-bold text-sm text-nalar-text group-hover:text-[#C25127] transition-colors line-clamp-1">
+                    <h4 className="font-serif font-bold text-sm text-nalar-text group-hover:text-nalar-accent transition-colors line-clamp-1">
                       {opt.title}
                     </h4>
                     <p className="text-xs text-nalar-muted leading-relaxed mt-1 line-clamp-2">
@@ -351,7 +351,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                   </div>
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-[#E5E0D5]/70 flex items-center justify-between text-xs font-semibold text-nalar-muted group-hover:text-[#C25127] transition-colors">
+                <div className="pt-3 mt-3 border-t border-nalar-border/70 flex items-center justify-between text-xs font-semibold text-nalar-muted group-hover:text-nalar-accent transition-colors">
                   <span>Buat dengan 1-Klik</span>
                   <span className="transform group-hover:translate-x-1 transition-transform">→</span>
                 </div>
@@ -364,18 +364,18 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
       {/* Saved Artifacts Section */}
       <div className="space-y-3 pt-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-nalar-muted">
             Dokumen Tersimpan ({artifacts.length})
           </h3>
         </div>
 
         {loadingList ? (
-          <div className="py-12 flex justify-center text-muted-foreground">
+          <div className="py-12 flex justify-center text-nalar-muted">
             <Loader2 className="w-6 h-6 animate-spin" />
           </div>
         ) : artifacts.length === 0 ? (
-          <div className="p-8 border border-dashed border-[#DFC9B8] rounded-2xl text-center space-y-3 bg-[#FAF8F5]/50">
-            <div className="w-12 h-12 rounded-2xl bg-[#F3EAE2] text-[#A6421D] flex items-center justify-center mx-auto">
+          <div className="p-8 border border-dashed border-nalar-citationBorder rounded-2xl text-center space-y-3 bg-nalar-bg/50">
+            <div className="w-12 h-12 rounded-2xl bg-nalar-citationBg text-nalar-accent flex items-center justify-center mx-auto">
               <FileCode2 className="w-6 h-6" />
             </div>
             <div className="space-y-1">
@@ -390,7 +390,6 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
             {artifacts.map((art) => {
               const matchedOption = ALL_OPTIONS.find((o) => o.kind === art.kind);
               const badgeClass = matchedOption?.badgeColor || 'bg-muted text-muted-foreground';
-              const Icon = matchedOption?.icon || FileText;
 
               const dateStr = new Date(art.created_at).toLocaleDateString('id-ID', {
                 day: 'numeric',
@@ -402,7 +401,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                 <div
                   key={art.id}
                   onClick={() => setActiveArtifact(art)}
-                  className="p-5 rounded-2xl border border-[#E5E0D5] bg-white hover:border-[#C25127] hover:shadow-sm cursor-pointer transition-all flex flex-col justify-between space-y-3 group"
+                  className="p-5 rounded-2xl border border-nalar-border bg-nalar-bg/60 hover:border-nalar-accent hover:shadow-sm cursor-pointer transition-all flex flex-col justify-between space-y-3 group"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
@@ -415,7 +414,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                       </span>
                     </div>
 
-                    <h4 className="font-serif font-bold text-sm text-nalar-text group-hover:text-[#C25127] transition-colors line-clamp-1">
+                    <h4 className="font-serif font-bold text-sm text-nalar-text group-hover:text-nalar-accent transition-colors line-clamp-1">
                       {art.title}
                     </h4>
 
@@ -424,8 +423,8 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-[#E5E0D5]/70 text-xs">
-                    <span className="text-[#C25127] font-semibold flex items-center gap-1 group-hover:underline">
+                  <div className="flex items-center justify-between pt-3 border-t border-nalar-border/70 text-xs">
+                    <span className="text-nalar-accent font-semibold flex items-center gap-1 group-hover:underline">
                       <span>Buka Catatan</span>
                       <ExternalLink className="w-3 h-3" />
                     </span>

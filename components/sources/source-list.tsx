@@ -129,7 +129,7 @@ export function SourceList({
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
             placeholder="Cari nama berkas..."
-            className="w-full pl-8 pr-7 py-1.5 rounded-lg border border-[#E5E0D5] bg-white text-xs text-nalar-text placeholder:text-nalar-muted focus:outline-none focus:ring-1 focus:ring-nalar-accent focus:border-nalar-accent transition shadow-2xs"
+            className="w-full pl-8 pr-7 py-1.5 rounded-lg border border-nalar-border bg-nalar-card text-xs text-nalar-text placeholder:text-nalar-muted focus:outline-none focus:ring-1 focus:ring-nalar-accent focus:border-nalar-accent transition shadow-2xs"
           />
           {filterQuery && (
             <button
@@ -160,10 +160,10 @@ export function SourceList({
               <div
                 key={source.id}
                 onClick={() => onSelectSource?.(source)}
-                className={`p-2.5 rounded-lg border text-xs cursor-pointer transition-all flex flex-col gap-1.5 ${
+                className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all flex flex-col gap-1.5 ${
                   isSelected
-                    ? 'border-[#C25127] bg-[#F3EAE2]/50 shadow-2xs'
-                    : 'bg-white border-[#E5E0D5] hover:border-[#C25127]/40 shadow-2xs'
+                    ? 'border-nalar-accent bg-nalar-citationBg/60 shadow-2xs'
+                    : 'bg-nalar-card border-nalar-border hover:border-nalar-accent/50 shadow-2xs'
                 }`}
               >
                 {/* Row 1: Checkbox + Name + Actions */}
@@ -174,7 +174,7 @@ export function SourceList({
                       title={source.enabled ? 'Aktif dalam pencarian AI' : 'Dinonaktifkan'}
                       className={`w-3.5 h-3.5 rounded flex items-center justify-center shrink-0 transition-colors ${
                         source.enabled
-                          ? 'text-[#C25127]'
+                          ? 'text-nalar-accent'
                           : 'text-nalar-muted'
                       }`}
                     >
@@ -200,7 +200,7 @@ export function SourceList({
                 </div>
 
                 {/* Row 2: Metadata (Size + Status / Chunks + Retry) */}
-                <div className="flex items-center justify-between text-[10px] text-nalar-muted pl-5 pt-0.5 border-t border-[#E5E0D5]/40">
+                <div className="flex items-center justify-between text-[10px] text-nalar-muted pl-5 pt-0.5 border-t border-nalar-border/50">
                   <span>{formatBytes(source.file_size)}</span>
 
                   <div className="flex items-center gap-1.5">

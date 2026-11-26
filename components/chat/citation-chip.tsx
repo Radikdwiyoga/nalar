@@ -13,7 +13,7 @@ export function CitationChip({ citation, onClick }: CitationChipProps) {
     <button
       type="button"
       onClick={() => onClick?.(citation)}
-      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 my-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] hover:bg-[#C25127] hover:text-white text-xs font-semibold transition-all cursor-pointer shadow-2xs"
+      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 my-0.5 rounded-md bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder hover:bg-nalar-accent hover:text-white text-xs font-semibold transition-all cursor-pointer shadow-2xs"
       title={`Buka kutipan: ${citation.sourceName || 'Dokumen'} ${
         citation.page ? `(Hal. ${citation.page})` : ''
       }`}

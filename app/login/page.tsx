@@ -7,7 +7,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Loader2, AlertCircle, FileText, Bookmark, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Loader2, AlertCircle, FileText } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 function LoginForm() {
   const router = useRouter();
@@ -86,7 +87,7 @@ function LoginForm() {
         type="button"
         onClick={handleGoogleLogin}
         disabled={googleLoading || loading}
-        className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl border border-[#E5E0D5] bg-white hover:bg-[#F3F0EA] text-xs font-semibold text-nalar-text transition-all shadow-2xs cursor-pointer disabled:opacity-50"
+        className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl border border-nalar-border bg-nalar-card hover:bg-nalar-surface text-xs font-semibold text-nalar-text transition-all shadow-2xs cursor-pointer disabled:opacity-50"
       >
         {googleLoading ? (
           <Loader2 className="w-4 h-4 animate-spin text-nalar-accent" />
@@ -115,8 +116,8 @@ function LoginForm() {
 
       {/* Divider */}
       <div className="relative flex items-center justify-center">
-        <div className="border-t border-[#E5E0D5] w-full" />
-        <span className="bg-white px-3 text-[11px] uppercase tracking-wider text-nalar-muted font-medium absolute">
+        <div className="border-t border-nalar-border w-full" />
+        <span className="bg-nalar-card px-3 text-[11px] uppercase tracking-wider text-nalar-muted font-medium absolute">
           atau dengan email
         </span>
       </div>
@@ -129,11 +130,12 @@ function LoginForm() {
           <input
             id="email"
             type="email"
+            autoComplete="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="nama@email.com"
-            className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E0D5] bg-white text-xs text-nalar-text focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent transition-all shadow-2xs"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-nalar-border bg-nalar-bg text-xs text-nalar-text focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent transition-all shadow-2xs"
           />
         </div>
 
@@ -146,11 +148,12 @@ function LoginForm() {
           <input
             id="password"
             type="password"
+            autoComplete="current-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full px-3.5 py-2.5 rounded-xl border border-[#E5E0D5] bg-white text-xs text-nalar-text focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent transition-all shadow-2xs"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-nalar-border bg-nalar-bg text-xs text-nalar-text focus:outline-none focus:ring-2 focus:ring-nalar-accent/30 focus:border-nalar-accent transition-all shadow-2xs"
           />
         </div>
 
@@ -175,22 +178,25 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-nalar-bg">
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-12 bg-nalar-bg text-nalar-text">
       {/* Left Column (5 Cols) - Form & Brand */}
-      <div className="lg:col-span-5 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-white border-r border-[#E5E0D5]">
-        <Link href="/" className="inline-flex items-center gap-2.5 group w-fit">
-          <div className="p-1 rounded-xl bg-[#F3EAE2] border border-[#DFC9B8]/60 group-hover:scale-105 transition-transform">
-            <Image
-              src="/logo-icon.png"
-              alt="Nalar Logo"
-              width={28}
-              height={28}
-              className="w-7 h-7 object-contain"
-              priority
-            />
-          </div>
-          <span className="font-serif font-bold text-lg text-nalar-text tracking-tight">Nalar</span>
-        </Link>
+      <div className="lg:col-span-5 flex flex-col justify-between p-6 sm:p-10 lg:p-12 bg-nalar-card border-r border-nalar-border">
+        <div className="flex items-center justify-between">
+          <Link href="/" className="inline-flex items-center gap-2.5 group w-fit">
+            <div className="p-1 rounded-xl bg-nalar-citationBg border border-nalar-citationBorder group-hover:scale-105 transition-transform">
+              <Image
+                src="/logo-icon.png"
+                alt="Nalar Logo"
+                width={28}
+                height={28}
+                className="w-7 h-7 object-contain"
+                priority
+              />
+            </div>
+            <span className="font-serif font-bold text-lg text-nalar-text tracking-tight">Nalar</span>
+          </Link>
+          <ThemeToggle compact />
+        </div>
 
         <div className="py-8 my-auto">
           <Suspense fallback={<Loader2 className="w-8 h-8 animate-spin text-nalar-accent mx-auto" />}>
@@ -198,7 +204,7 @@ export default function LoginPage() {
           </Suspense>
         </div>
 
-        <div className="text-[11px] text-nalar-muted pt-4 border-t border-[#E5E0D5]/60 flex items-center justify-between">
+        <div className="text-[11px] text-nalar-muted pt-4 border-t border-nalar-border/60 flex items-center justify-between">
           <span>© 2026 Nalar — AI Document Synthesis</span>
           <Link href="/" className="hover:text-nalar-text transition">
             Kembali ke Beranda
@@ -207,7 +213,9 @@ export default function LoginPage() {
       </div>
 
       {/* Right Column (7 Cols) - Editorial Value Proposition & Citation Simulation */}
-      <div className="hidden lg:flex lg:col-span-7 flex-col justify-center p-12 xl:p-16 bg-[#F3F0EA] relative overflow-hidden">
+      <div className="hidden lg:flex lg:col-span-7 flex-col justify-center p-12 xl:p-16 bg-nalar-surface relative overflow-hidden">
+        <div className="absolute inset-0 editorial-grid-fade opacity-70 pointer-events-none" aria-hidden="true" />
+        <div className="absolute inset-0 ambient-mesh pointer-events-none" aria-hidden="true" />
         <div className="max-w-xl mx-auto space-y-8 relative z-10">
           <div className="space-y-3">
             <span className="text-[11px] font-bold uppercase tracking-widest text-nalar-accent">
@@ -222,31 +230,31 @@ export default function LoginPage() {
           </div>
 
           {/* Interactive Citation Card Simulation */}
-          <div className="bg-white p-5 rounded-2xl border border-[#E5E0D5] shadow-xs space-y-3.5">
-            <div className="flex items-center justify-between text-xs pb-2 border-b border-[#E5E0D5]/70">
+          <div className="floating-island p-5 rounded-2xl space-y-3.5">
+            <div className="flex items-center justify-between text-xs pb-2 border-b border-nalar-border/70">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-nalar-accent" />
                 <span className="font-serif font-bold text-nalar-text">Hasil Sintesis Multi-Sumber</span>
               </div>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
                 100% Terverifikasi
               </span>
             </div>
 
             <p className="text-xs text-nalar-text leading-relaxed">
               Berdasarkan klausul pelaksanaan pekerjaan{' '}
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded-md bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder text-[11px] font-semibold">
                 [S1 Hal. 4]
               </span>
               , seluruh kewajiban penyerahan laporan kemajuan mingguan wajib diselesaikan paling lambat 7 hari kerja sebelum termin pencairan kedua{' '}
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded-md bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder text-[11px] font-semibold">
                 [S3]
               </span>.
             </p>
 
             {/* Highlighted Quote Box */}
-            <div className="p-3 rounded-xl bg-[#FEF3C7] border-l-4 border-[#C25127] text-xs text-nalar-text space-y-1">
-              <div className="flex items-center justify-between text-[10px] text-[#A6421D] font-bold">
+            <div className="p-3 rounded-xl bg-amber-500/15 border-l-4 border-nalar-accent border-y border-r border-amber-500/30 text-xs text-nalar-text space-y-1">
+              <div className="flex items-center justify-between text-[10px] text-nalar-accent font-bold">
                 <span>Kutipan Langsung dari Berkas</span>
                 <span>Pasal 8 Ayat 2</span>
               </div>

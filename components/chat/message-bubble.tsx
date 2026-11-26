@@ -105,14 +105,14 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
         className={`max-w-[95%] sm:max-w-[88%] space-y-2.5 ${
           isUser
             ? 'bg-nalar-accent text-white rounded-2xl rounded-tr-sm p-3.5 sm:p-4 shadow-xs'
-            : 'bg-white border border-[#E5E0D5] rounded-xl rounded-tl-sm p-5 sm:p-6 shadow-xs'
+            : 'bg-nalar-bg/70 border border-nalar-border rounded-2xl rounded-tl-sm p-5 sm:p-6 shadow-2xs'
         }`}
       >
         {/* Prominent Word Download Card if the answer is a structured document / summary */}
         {isDocumentSummary && (
-          <div className="flex items-center justify-between p-3 rounded-xl border border-[#E5E0D5] bg-[#FAF8F5] hover:bg-[#F3F0EA] transition mb-3">
+          <div className="flex items-center justify-between p-3 rounded-xl border border-nalar-border bg-nalar-card hover:bg-nalar-surface transition mb-3">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-[#F3EAE2] text-[#C25127] flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-nalar-citationBg text-nalar-accent flex items-center justify-center shrink-0">
                 <FileText className="w-4 h-4" />
               </div>
               <div className="min-w-0">
@@ -153,7 +153,7 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
                 </h1>
               ),
               h2: ({ children }) => (
-                <h2 className="font-serif font-bold text-lg sm:text-xl text-nalar-text mt-3.5 mb-1.5 tracking-tight border-b border-[#E5E0D5] pb-1">
+                <h2 className="font-serif font-bold text-lg sm:text-xl text-nalar-text mt-3.5 mb-1.5 tracking-tight border-b border-nalar-border pb-1">
                   {children}
                 </h2>
               ),
@@ -173,7 +173,7 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
                         e.preventDefault();
                         if (cit) onCitationClick?.(cit);
                       }}
-                      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] hover:bg-[#C25127] hover:text-white text-[11px] font-semibold transition-all cursor-pointer align-baseline no-underline shadow-2xs"
+                      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded-md bg-nalar-citationBg text-nalar-accent border border-nalar-citationBorder hover:bg-nalar-accent hover:text-white text-[11px] font-semibold transition-all cursor-pointer align-baseline no-underline shadow-2xs"
                       title={
                         cit
                           ? `Buka dokumen: ${cit.sourceName || marker}${cit.page ? ` (Hal. ${cit.page})` : ''}`
