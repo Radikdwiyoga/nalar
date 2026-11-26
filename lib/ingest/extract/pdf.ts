@@ -57,7 +57,12 @@ export async function extractPdf(buffer: Uint8Array): Promise<{
     const ai = new GoogleGenAI({ apiKey });
     const base64Data = Buffer.from(buffer).toString('base64');
 
-    const ocrModel = process.env.GEMINI_OCR_MODEL || process.env.GEMINI_CHAT_MODEL || 'gemini-2.5-flash';
+    const rawOcrModel =
+      process.env.GEMINI_OCR_MODEL || process.env.GEMINI_CHAT_MODEL || 'gemini-3.8-flash';
+    const ocrModel =
+      rawOcrModel === 'gemini-2.5-flash' || rawOcrModel === 'gemini-2.5-flash-lite'
+        ? 'gemini-3.8-flash'
+        : rawOcrModel;
     const ocrResponse = await ai.models.generateContent({
       model: ocrModel,
       contents: [

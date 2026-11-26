@@ -31,37 +31,103 @@ export interface ChatResult {
   attempts: AttemptRecord[];
 }
 
+/**
+ * Automatically upgrades deprecated or unprefixed model IDs (e.g. from older Vercel env vars)
+ * to currently supported 2026 production model IDs.
+ */
+export function normalizeModelId(provider: RouteConfig['provider'], rawModel: string): string {
+  const m = rawModel.trim().replace(/^models\//, '');
+
+  if (provider === 'gemini') {
+    if (
+      m === 'gemini-2.5-flash' ||
+      m === 'gemini-2.0-flash' ||
+      m === 'gemini-1.5-flash' ||
+      m === 'gemini-1.5-pro'
+    ) {
+      return 'gemini-3.8-flash';
+    }
+    if (m === 'gemini-2.5-flash-lite') {
+      return 'gemini-3.5-flash-lite';
+    }
+    return m;
+  }
+
+  if (provider === 'groq') {
+    if (m === 'gpt-oss-120b') return 'openai/gpt-oss-120b';
+    if (m === 'gpt-oss-20b') return 'openai/gpt-oss-20b';
+    if (m === 'qwen3.8-27b') return 'qwen/qwen3.8-27b';
+    if (
+      m === 'llama-3.3-70b-versatile' ||
+      m === 'llama-3.1-70b-versatile' ||
+      m === 'llama3-70b-8192'
+    ) {
+      return 'openai/gpt-oss-120b';
+    }
+    if (m === 'llama-3.1-8b-instant' || m === 'llama3-8b-8192' || m === 'mixtral-8x7b-32768') {
+      return 'qwen/qwen3.8-27b';
+    }
+    return m;
+  }
+
+  return m;
+}
+
+const VERIFIED_FALLBACK_ROUTES: RouteConfig[] = [
+  { provider: 'gemini', model: 'gemini-3.8-flash' },
+  { provider: 'groq', model: 'openai/gpt-oss-120b' },
+  { provider: 'gemini', model: 'gemini-3.5-flash' },
+  { provider: 'groq', model: 'qwen/qwen3.8-27b' },
+  { provider: 'gemini', model: 'gemini-3.5-flash-lite' },
+  { provider: 'groq', model: 'openai/gpt-oss-20b' },
+];
+
+function deduplicateRoutes(routes: RouteConfig[]): RouteConfig[] {
+  const seen = new Set<string>();
+  const result: RouteConfig[] = [];
+  for (const r of routes) {
+    const normalizedModel = normalizeModelId(r.provider, r.model);
+    const key = `${r.provider}:${normalizedModel}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push({ provider: r.provider, model: normalizedModel });
+    }
+  }
+  return result;
+}
+
 function buildDefaultRoutes(): RouteConfig[] {
+  const customRoutes: RouteConfig[] = [];
+
   const envRouteStr = process.env.AI_CHAT_ROUTE?.trim();
   if (envRouteStr) {
-    const parsed = envRouteStr
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean)
-      .map((entry) => {
-        const idx = entry.indexOf(':');
-        if (idx === -1) return null;
-        const provider = entry.slice(0, idx).trim() as RouteConfig['provider'];
-        const model = entry.slice(idx + 1).trim();
-        if ((provider === 'gemini' || provider === 'groq' || provider === 'local') && model) {
-          return { provider, model };
-        }
-        return null;
-      })
-      .filter((r): r is RouteConfig => r !== null);
-
-    if (parsed.length > 0) {
-      return parsed;
+    for (const rawEntry of envRouteStr.split(',')) {
+      const entry = rawEntry.trim();
+      const idx = entry.indexOf(':');
+      if (idx === -1) continue;
+      const provider = entry.slice(0, idx).trim() as RouteConfig['provider'];
+      const model = entry.slice(idx + 1).trim();
+      if ((provider === 'gemini' || provider === 'groq' || provider === 'local') && model) {
+        customRoutes.push({ provider, model: normalizeModelId(provider, model) });
+      }
+    }
+  } else {
+    if (process.env.GEMINI_CHAT_MODEL) {
+      customRoutes.push({
+        provider: 'gemini',
+        model: normalizeModelId('gemini', process.env.GEMINI_CHAT_MODEL),
+      });
+    }
+    if (process.env.GROQ_CHAT_MODEL) {
+      customRoutes.push({
+        provider: 'groq',
+        model: normalizeModelId('groq', process.env.GROQ_CHAT_MODEL),
+      });
     }
   }
 
-  return [
-    { provider: 'gemini', model: process.env.GEMINI_CHAT_MODEL || 'gemini-2.5-flash' },
-    { provider: 'groq', model: process.env.GROQ_CHAT_MODEL || 'llama-3.3-70b-versatile' },
-    { provider: 'gemini', model: 'gemini-2.5-flash-lite' },
-    { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_ALT || 'openai/gpt-oss-120b' },
-    { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_FAST || 'llama-3.1-8b-instant' },
-  ];
+  // Always append verified live fallback routes so stale env vars can never brick chat/studio
+  return deduplicateRoutes([...customRoutes, ...VERIFIED_FALLBACK_ROUTES]);
 }
 
 export function getConfiguredRoutes(
@@ -127,7 +193,6 @@ export async function chat(req: ChatRequest): Promise<ChatResult> {
           continue;
         }
 
-        // Successfully initiated stream
         await recordSuccess(route);
         attempts.push({
           provider: route.provider,
@@ -155,21 +220,18 @@ export async function chat(req: ChatRequest): Promise<ChatResult> {
           error: `${classified.kind}: ${classified.message}`,
         });
 
-        // If user query was blocked by safety/content filter, abort immediately
         if (classified.kind === 'CONTENT_FILTER') {
           throw classified;
         }
 
-        // For non-retryable model/auth issues, skip directly to the next route without repeating
         if (classified.kind === 'MODEL_GONE' || classified.kind === 'AUTH') {
           break;
         }
 
-        // If retryable and attempt is 0, back off briefly before 1 retry on the same provider
         if (attempt === 0 && classified.retryable) {
           await new Promise((res) => setTimeout(res, 500));
         } else {
-          break; // move to next provider in fallback chain
+          break;
         }
       }
     }
@@ -190,4 +252,3 @@ export async function embed(texts: string[]): Promise<number[][]> {
     throw err;
   }
 }
-
