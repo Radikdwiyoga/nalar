@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
@@ -57,6 +58,15 @@ export async function GET(
     }
   }
 
+  if (typeof notebook.description === 'string' && notebook.description.startsWith('{"_meta":true')) {
+    try {
+      const parsedMeta = JSON.parse(notebook.description);
+      notebook.description = parsedMeta.textDescription || null;
+    } catch {
+      notebook.description = null;
+    }
+  }
+
   return NextResponse.json({ data: notebook });
 }
 
@@ -88,7 +98,16 @@ export async function PATCH(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ data: notebook });
+    if (typeof notebook.description === 'string' && notebook.description.startsWith('{"_meta":true')) {
+    try {
+      const parsedMeta = JSON.parse(notebook.description);
+      notebook.description = parsedMeta.textDescription || null;
+    } catch {
+      notebook.description = null;
+    }
+  }
+
+  return NextResponse.json({ data: notebook });
   } catch (err: any) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: err.errors[0].message }, { status: 400 });
@@ -107,6 +126,21 @@ export async function DELETE(
 
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Clean up all physical files in Supabase Storage before deleting notebook
+  const { data: notebookSources } = await supabase
+    .from('sources')
+    .select('storage_path')
+    .eq('notebook_id', id)
+    .eq('user_id', user.id);
+
+  if (notebookSources && notebookSources.length > 0) {
+    const paths = notebookSources.map((s) => s.storage_path).filter(Boolean);
+    if (paths.length > 0) {
+      const admin = createAdminClient();
+      await admin.storage.from('sources').remove(paths);
+    }
   }
 
   // Deleting a notebook cascades delete to sources, source_chunks, threads, artifacts.

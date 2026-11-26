@@ -201,7 +201,7 @@ export function DashboardShell({
                 alt="Nalar Logo"
                 width={26}
                 height={26}
-                className="w-6.5 h-6.5 object-contain"
+                className="w-6 h-6 object-contain"
               />
               <span className="font-serif font-bold text-base tracking-tight text-nalar-text">Nalar</span>
             </div>

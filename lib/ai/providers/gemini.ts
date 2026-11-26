@@ -10,7 +10,7 @@ function getClient() {
 }
 
 export async function generateGeminiStream({
-  model = process.env.GEMINI_CHAT_MODEL || 'gemini-3.1-flash-lite',
+  model = process.env.GEMINI_CHAT_MODEL || 'gemini-2.5-flash',
   messages,
   temperature = 0.2,
   signal,

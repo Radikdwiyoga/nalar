@@ -104,8 +104,8 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
       <div
         className={`max-w-[95%] sm:max-w-[88%] space-y-2.5 ${
           isUser
-            ? 'bg-nalar-accent text-white rounded-2xl rounded-tr-xs p-3.5 sm:p-4 shadow-xs'
-            : 'bg-white border border-[#E5E0D5] rounded-xl rounded-tl-xs p-5 sm:p-6 shadow-xs'
+            ? 'bg-nalar-accent text-white rounded-2xl rounded-tr-sm p-3.5 sm:p-4 shadow-xs'
+            : 'bg-white border border-[#E5E0D5] rounded-xl rounded-tl-sm p-5 sm:p-6 shadow-xs'
         }`}
       >
         {/* Prominent Word Download Card if the answer is a structured document / summary */}
@@ -173,7 +173,7 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
                         e.preventDefault();
                         if (cit) onCitationClick?.(cit);
                       }}
-                      className="inline-flex items-center gap-0.5 px-1.5 py-0.2 mx-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] hover:bg-[#C25127] hover:text-white text-[11px] font-semibold transition-all cursor-pointer align-baseline no-underline shadow-2xs"
+                      className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] hover:bg-[#C25127] hover:text-white text-[11px] font-semibold transition-all cursor-pointer align-baseline no-underline shadow-2xs"
                       title={
                         cit
                           ? `Buka dokumen: ${cit.sourceName || marker}${cit.page ? ` (Hal. ${cit.page})` : ''}`
@@ -184,6 +184,14 @@ export function MessageBubble({ message, onCitationClick }: MessageBubbleProps) 
                       <span>{children}</span>
                     </button>
                   );
+                }
+                const isSafeHref =
+                  typeof href === 'string' &&
+                  (href.startsWith('https://') ||
+                    href.startsWith('http://') ||
+                    href.startsWith('mailto:'));
+                if (!isSafeHref) {
+                  return <span>{children}</span>;
                 }
                 return (
                   <a

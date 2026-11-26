@@ -35,12 +35,40 @@ export async function POST(
     return NextResponse.json({ error: { code: 'NOT_FOUND', message: 'Sumber tidak ditemukan' } }, { status: 404 });
   }
 
+  // Guard against duplicate concurrent ingestion calls from client polling
+  if (source.status === 'processing' && source.updated_at) {
+    const elapsedMs = Date.now() - new Date(source.updated_at).getTime();
+    if (elapsedMs < 90_000) {
+      return NextResponse.json(
+        {
+          stage: source.stage,
+          done: false,
+          progress: source.progress,
+          alreadyProcessing: true,
+        },
+        { status: 202 }
+      );
+    }
+  }
+
   try {
-    // 1. Update status to processing
-    await admin
-      .from('sources')
-      .update({ status: 'processing', stage: 'extract', progress: 10 })
-      .eq('id', id);
+    // 1. Update status to processing & sync jobs table
+    await Promise.all([
+      admin
+        .from('sources')
+        .update({ status: 'processing', stage: 'extract', progress: 10 })
+        .eq('id', id),
+      admin
+        .from('jobs')
+        .update({
+          status: 'running',
+          stage: 'extract',
+          started_at: new Date().toISOString(),
+          error: null,
+        })
+        .eq('source_id', id)
+        .eq('user_id', user.id),
+    ]);
 
     // 2. Download file buffer from storage
     const { data: fileBlob, error: downloadError } = await admin.storage
@@ -184,21 +212,33 @@ export async function POST(
       }
     }
 
-    // 7. Mark as ready
-    await admin
-      .from('sources')
-      .update({
-        status: 'ready',
-        stage: 'done',
-        progress: 100,
-        page_count: pageCount,
-        char_count: charCount,
-        chunk_count: chunks.length,
-        embedding_model: embeddingModelName,
-        error_code: null,
-        error_message: null,
-      })
-      .eq('id', id);
+    // 7. Mark source & job as ready/done
+    await Promise.all([
+      admin
+        .from('sources')
+        .update({
+          status: 'ready',
+          stage: 'done',
+          progress: 100,
+          page_count: pageCount,
+          char_count: charCount,
+          chunk_count: chunks.length,
+          embedding_model: embeddingModelName,
+          error_code: null,
+          error_message: null,
+        })
+        .eq('id', id),
+      admin
+        .from('jobs')
+        .update({
+          status: 'done',
+          stage: 'done',
+          finished_at: new Date().toISOString(),
+          error: null,
+        })
+        .eq('source_id', id)
+        .eq('user_id', user.id),
+    ]);
 
     return NextResponse.json({
       stage: 'done',
@@ -208,14 +248,25 @@ export async function POST(
     });
   } catch (err: any) {
     console.error('Ingestion error:', err);
-    await admin
-      .from('sources')
-      .update({
-        status: 'failed',
-        error_code: 'INGEST_FAILED',
-        error_message: err.message || 'Ingestion failed',
-      })
-      .eq('id', id);
+    await Promise.all([
+      admin
+        .from('sources')
+        .update({
+          status: 'failed',
+          error_code: 'INGEST_FAILED',
+          error_message: err.message || 'Ingestion failed',
+        })
+        .eq('id', id),
+      admin
+        .from('jobs')
+        .update({
+          status: 'failed',
+          finished_at: new Date().toISOString(),
+          error: (err.message || 'Ingestion failed').slice(0, 500),
+        })
+        .eq('source_id', id)
+        .eq('user_id', user.id),
+    ]);
 
     return NextResponse.json(
       { error: { code: 'INGEST_FAILED', message: err.message } },

@@ -41,6 +41,41 @@ export async function POST(
   const errors: any[] = [];
   const admin = createAdminClient();
 
+  // Check daily upload limit & per-notebook source limit
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+  const [{ count: todayUploads }, { data: profile }, { count: currentNotebookSources }] = await Promise.all([
+    admin
+      .from('usage_events')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('kind', 'upload')
+      .gte('created_at', startOfDay.toISOString()),
+    admin.from('profiles').select('daily_upload_limit').eq('id', user.id).single(),
+    admin
+      .from('sources')
+      .select('*', { count: 'exact', head: true })
+      .eq('notebook_id', notebookId)
+      .eq('user_id', user.id),
+  ]);
+
+  const dailyUploadLimit = profile?.daily_upload_limit ?? 50;
+  const maxSourcesPerNotebook = parseInt(process.env.MAX_SOURCES_PER_NOTEBOOK || '50', 10);
+
+  if ((todayUploads ?? 0) >= dailyUploadLimit) {
+    return NextResponse.json(
+      { error: { code: 'QUOTA_EXCEEDED', message: `Batas unggah harian (${dailyUploadLimit} berkas) telah tercapai` } },
+      { status: 429 }
+    );
+  }
+
+  if ((currentNotebookSources ?? 0) + files.length > maxSourcesPerNotebook) {
+    return NextResponse.json(
+      { error: { code: 'NOTEBOOK_FULL', message: `Maksimal ${maxSourcesPerNotebook} dokumen sumber per notebook` } },
+      { status: 400 }
+    );
+  }
+
   for (const file of files) {
     const fileName = file.name;
     const fileSize = file.size;

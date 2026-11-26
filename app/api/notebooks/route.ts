@@ -29,12 +29,25 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const formattedNotebooks = notebooks.map((nb: any) => ({
-    ...nb,
-    sources_count: nb.sources?.length || 0,
-    preview_sources: nb.sources?.slice(0, 2).map((s: any) => s.file_name) || [],
-    artifacts_count: nb.artifacts?.[0]?.count || 0,
-  }));
+  const formattedNotebooks = notebooks.map((nb: any) => {
+    let cleanDescription = nb.description;
+    if (typeof cleanDescription === 'string' && cleanDescription.startsWith('{"_meta":true')) {
+      try {
+        const parsedMeta = JSON.parse(cleanDescription);
+        cleanDescription = parsedMeta.textDescription || null;
+      } catch {
+        cleanDescription = null;
+      }
+    }
+
+    return {
+      ...nb,
+      description: cleanDescription,
+      sources_count: nb.sources?.length || 0,
+      preview_sources: nb.sources?.slice(0, 2).map((s: any) => s.file_name) || [],
+      artifacts_count: nb.artifacts?.[0]?.count || 0,
+    };
+  });
 
   return NextResponse.json({ data: formattedNotebooks });
 }

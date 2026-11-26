@@ -55,8 +55,49 @@ export async function POST(request: Request) {
   }
 
   const admin = createAdminClient();
+  const startTime = Date.now();
 
-  // Pastikan notebook ini milik user yang sedang login (Multi-tenant Security Isolation)
+  // 1. Check daily artifact & token quota + user preferred provider
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  const [{ data: todayEvents }, { data: profile }] = await Promise.all([
+    admin
+      .from('usage_events')
+      .select('kind, input_tokens, output_tokens')
+      .eq('user_id', user.id)
+      .gte('created_at', startOfDay.toISOString()),
+    admin
+      .from('profiles')
+      .select('daily_artifact_limit, daily_token_limit, preferred_provider')
+      .eq('id', user.id)
+      .single(),
+  ]);
+
+  let artifactCount = 0;
+  let usedTokens = 0;
+  for (const ev of todayEvents || []) {
+    if (ev.kind === 'artifact') artifactCount++;
+    usedTokens += (ev.input_tokens || 0) + (ev.output_tokens || 0);
+  }
+
+  const dailyArtifactLimit = profile?.daily_artifact_limit ?? 20;
+  const dailyTokenLimit = profile?.daily_token_limit ?? 300000;
+
+  if (artifactCount >= dailyArtifactLimit) {
+    return NextResponse.json(
+      { error: { code: 'QUOTA_EXCEEDED', message: 'Batas pembuatan dokumen sintesis harian telah tercapai' } },
+      { status: 429 }
+    );
+  }
+  if (usedTokens >= dailyTokenLimit) {
+    return NextResponse.json(
+      { error: { code: 'TOKEN_QUOTA_EXCEEDED', message: 'Batas kuota token AI harian telah tercapai' } },
+      { status: 429 }
+    );
+  }
+
+  // 2. Pastikan notebook ini milik user yang sedang login (Multi-tenant Security Isolation)
   const { data: notebook, error: nbError } = await admin
     .from('notebooks')
     .select('id')
@@ -71,34 +112,58 @@ export async function POST(request: Request) {
     );
   }
 
-  // Fetch sources list to label chunks by document filename
-  const { data: sourcesData } = await admin
+  // 3. Fetch ONLY ready & enabled sources (or explicit selected sourceIds)
+  let sourcesQuery = admin
     .from('sources')
     .select('id, file_name')
     .eq('notebook_id', notebookId)
-    .eq('user_id', user.id);
-
-  const sourceNameMap = new Map<string, string>();
-  sourcesData?.forEach((s) => sourceNameMap.set(s.id, s.file_name));
-
-  // Fetch chunks from the notebook milik user
-  const chunkLimit = Array.isArray(sourceIds) && sourceIds.length > 1 ? 64 : 40;
-  let query = admin
-    .from('source_chunks')
-    .select('content, source_id, page_number')
-    .eq('notebook_id', notebookId)
     .eq('user_id', user.id)
-    .limit(chunkLimit);
+    .eq('status', 'ready');
 
   if (Array.isArray(sourceIds) && sourceIds.length > 0) {
-    query = query.in('source_id', sourceIds);
+    sourcesQuery = sourcesQuery.in('id', sourceIds);
+  } else {
+    sourcesQuery = sourcesQuery.eq('enabled', true);
   }
 
-  const { data: chunks } = await query;
+  const { data: sourcesData } = await sourcesQuery;
+  const activeSources = sourcesData || [];
 
-  if (!chunks || chunks.length === 0) {
+  if (activeSources.length === 0) {
     return NextResponse.json(
-      { error: { code: 'NO_READY_SOURCES', message: 'Belum ada dokumen sumber yang siap dalam notebook ini' } },
+      { error: { code: 'NO_READY_SOURCES', message: 'Belum ada dokumen sumber aktif yang siap dalam notebook ini' } },
+      { status: 409 }
+    );
+  }
+
+  const sourceNameMap = new Map<string, string>();
+  activeSources.forEach((s) => sourceNameMap.set(s.id, s.file_name));
+  const activeSourceIds = activeSources.map((s) => s.id);
+
+  // 4. Balanced Multi-Document Chunk Retrieval (ensures every active document is represented)
+  const totalChunkBudget = activeSourceIds.length > 1 ? 64 : 40;
+  const perSourceLimit = Math.max(4, Math.ceil(totalChunkBudget / activeSourceIds.length));
+
+  const perSourceResults = await Promise.all(
+    activeSourceIds.map((srcId) =>
+      admin
+        .from('source_chunks')
+        .select('content, source_id, page_number, chunk_index')
+        .eq('notebook_id', notebookId)
+        .eq('user_id', user.id)
+        .eq('source_id', srcId)
+        .order('chunk_index', { ascending: true })
+        .limit(perSourceLimit)
+    )
+  );
+
+  const chunks = perSourceResults
+    .flatMap((res) => res.data || [])
+    .slice(0, totalChunkBudget);
+
+  if (chunks.length === 0) {
+    return NextResponse.json(
+      { error: { code: 'NO_READY_SOURCES', message: 'Belum ada potongan teks dokumen yang siap dalam notebook ini' } },
       { status: 409 }
     );
   }
@@ -128,7 +193,10 @@ export async function POST(request: Request) {
   ];
 
   try {
-    const chatResult = await chat({ messages });
+    const chatResult = await chat({
+      messages,
+      preferredProvider: profile?.preferred_provider || null,
+    });
     const reader = chatResult.stream.getReader();
     let contentMd = '';
 
@@ -137,6 +205,9 @@ export async function POST(request: Request) {
       if (done) break;
       contentMd += value;
     }
+
+    const usage = await chatResult.getUsage();
+    const latencyMs = Date.now() - startTime;
 
     const titles: Record<ArtifactKind, string> = {
       summary: 'Ringkasan Eksekutif',
@@ -158,7 +229,7 @@ export async function POST(request: Request) {
         kind: insertKind as any,
         title: titles[kind as ArtifactKind] || 'Dokumen Hasil Sintesis',
         content_md: contentMd,
-        source_ids: Array.isArray(sourceIds) ? sourceIds : [],
+        source_ids: activeSourceIds,
         provider: chatResult.provider as any,
         model: chatResult.model,
       })
@@ -176,7 +247,7 @@ export async function POST(request: Request) {
           kind: insertKind as any,
           title: titles[kind as ArtifactKind] || 'Dokumen Hasil Sintesis',
           content_md: contentMd,
-          source_ids: Array.isArray(sourceIds) ? sourceIds : [],
+          source_ids: activeSourceIds,
           provider: chatResult.provider as any,
           model: chatResult.model,
         })
@@ -190,12 +261,15 @@ export async function POST(request: Request) {
       throw error;
     }
 
-    // Log usage
+    // Log usage with real token counts & latency
     await admin.from('usage_events').insert({
       user_id: user.id,
       kind: 'artifact',
       provider: chatResult.provider as any,
       model: chatResult.model,
+      input_tokens: usage.inputTokens,
+      output_tokens: usage.outputTokens,
+      latency_ms: latencyMs,
       outcome: 'ok',
     });
 

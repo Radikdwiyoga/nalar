@@ -13,6 +13,7 @@ export interface ChatRequest {
   temperature?: number;
   signal?: AbortSignal;
   routeOverride?: string[];
+  preferredProvider?: 'gemini' | 'groq' | 'local' | null;
 }
 
 export interface AttemptRecord {
@@ -30,22 +31,60 @@ export interface ChatResult {
   attempts: AttemptRecord[];
 }
 
-const DEFAULT_ROUTES: RouteConfig[] = [
-  { provider: 'groq', model: process.env.GROQ_CHAT_MODEL || 'openai/gpt-oss-120b' },
-  { provider: 'gemini', model: process.env.GEMINI_CHAT_MODEL || 'gemini-3.5-flash' },
-  { provider: 'gemini', model: 'gemini-3.5-flash-lite' },
-  { provider: 'gemini', model: 'gemini-flash-lite-latest' },
-  { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_ALT || 'openai/gpt-oss-20b' },
-  { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_FAST || 'qwen/qwen3.8-27b' },
-];
+function buildDefaultRoutes(): RouteConfig[] {
+  const envRouteStr = process.env.AI_CHAT_ROUTE?.trim();
+  if (envRouteStr) {
+    const parsed = envRouteStr
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((entry) => {
+        const idx = entry.indexOf(':');
+        if (idx === -1) return null;
+        const provider = entry.slice(0, idx).trim() as RouteConfig['provider'];
+        const model = entry.slice(idx + 1).trim();
+        if ((provider === 'gemini' || provider === 'groq' || provider === 'local') && model) {
+          return { provider, model };
+        }
+        return null;
+      })
+      .filter((r): r is RouteConfig => r !== null);
+
+    if (parsed.length > 0) {
+      return parsed;
+    }
+  }
+
+  return [
+    { provider: 'gemini', model: process.env.GEMINI_CHAT_MODEL || 'gemini-2.5-flash' },
+    { provider: 'groq', model: process.env.GROQ_CHAT_MODEL || 'llama-3.3-70b-versatile' },
+    { provider: 'gemini', model: 'gemini-2.5-flash-lite' },
+    { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_ALT || 'openai/gpt-oss-120b' },
+    { provider: 'groq', model: process.env.GROQ_CHAT_MODEL_FAST || 'llama-3.1-8b-instant' },
+  ];
+}
+
+export function getConfiguredRoutes(
+  preferredProvider?: 'gemini' | 'groq' | 'local' | null
+): RouteConfig[] {
+  const base = buildDefaultRoutes();
+  if (!preferredProvider || preferredProvider === 'local') {
+    return base;
+  }
+  const primary = base.filter((r) => r.provider === preferredProvider);
+  const secondary = base.filter((r) => r.provider !== preferredProvider);
+  return [...primary, ...secondary];
+}
 
 export async function chat(req: ChatRequest): Promise<ChatResult> {
-  const deadline = Date.now() + (parseInt(process.env.AI_REQUEST_DEADLINE_MS || '45000', 10));
+  const deadline = Date.now() + parseInt(process.env.AI_REQUEST_DEADLINE_MS || '45000', 10);
+  const maxRetry = parseInt(process.env.AI_MAX_RETRY_PER_PROVIDER || '1', 10);
   const attempts: AttemptRecord[] = [];
 
+  const orderedRoutes = getConfiguredRoutes(req.preferredProvider);
   const candidateRoutes = req.routeOverride
-    ? DEFAULT_ROUTES.filter((r) => req.routeOverride!.includes(`${r.provider}:${r.model}`))
-    : DEFAULT_ROUTES;
+    ? orderedRoutes.filter((r) => req.routeOverride!.includes(`${r.provider}:${r.model}`))
+    : orderedRoutes;
 
   let lastError: Error | null = null;
 
@@ -63,7 +102,7 @@ export async function chat(req: ChatRequest): Promise<ChatResult> {
       continue;
     }
 
-    for (let attempt = 0; attempt <= 1; attempt++) {
+    for (let attempt = 0; attempt <= maxRetry; attempt++) {
       try {
         let result: {
           stream: ReadableStream<string>;

@@ -217,7 +217,7 @@ export function DocumentComparisonModal({
               value={customNote}
               onChange={(e) => setCustomNote(e.target.value)}
               placeholder="Contoh: Fokus pada perbandingan denda keterlambatan dan kepemilikan source code..."
-              className="w-full px-3 py-2 rounded-xl border bg-background text-xs focus:outline-hidden focus:ring-2 focus:ring-primary/20"
+              className="w-full px-3 py-2 rounded-xl border bg-background text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
         </div>

@@ -233,7 +233,7 @@ export function AudioPodcastPlayer({ contentMd, title }: AudioPodcastPlayerProps
   const progressPercent = Math.round(((currentLineIndex + 1) / lines.length) * 100);
 
   return (
-    <div className="rounded-2xl border border-orange-500/30 bg-linear-to-b from-orange-500/10 via-background to-background p-4 sm:p-5 shadow-sm space-y-4">
+    <div className="rounded-2xl border border-orange-500/30 bg-gradient-to-b from-orange-500/10 via-background to-background p-4 sm:p-5 shadow-sm space-y-4">
       {/* Header Player */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">

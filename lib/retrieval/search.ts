@@ -137,14 +137,15 @@ export async function hybridSearch({
     // Runs in parallel with vector search to guarantee exact codes, numbers, and clauses are never missed.
     let exactEntityChunks: any[] = [];
     if (exactEntities.length > 0) {
-      // Search chunks that contain any of the exact alphanumeric codes
+      // Search chunks that contain any of the exact alphanumeric codes (escape ILIKE wildcards)
       for (const entity of exactEntities.slice(0, 4)) {
+        const escapedEntity = entity.replace(/[\\%_]/g, (m) => `\\${m}`);
         const { data: entityData } = await admin
           .from('source_chunks')
           .select('id, source_id, content, page_number, sheet_name, heading_path, char_start, char_end')
           .eq('notebook_id', notebookId)
           .in('source_id', enabledSourceIds)
-          .ilike('content', `%${entity}%`)
+          .ilike('content', `%${escapedEntity}%`)
           .limit(10);
 
         if (entityData && entityData.length > 0) {

@@ -68,6 +68,10 @@ export default {
           "5": "hsl(var(--chart-5))",
         },
       },
+      boxShadow: {
+        '2xs': '0 1px 2px 0 rgba(28, 27, 24, 0.04)',
+        xs: '0 1px 3px 0 rgba(28, 27, 24, 0.07)',
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",

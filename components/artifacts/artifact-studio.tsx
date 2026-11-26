@@ -327,7 +327,7 @@ export function ArtifactStudio({ notebookId, readySourceCount, sources = [] }: A
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between gap-2">
                     <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${opt.color}`}>
-                      <Icon className="w-4.5 h-4.5" />
+                      <Icon className="w-4 h-4" />
                     </div>
                     {isGeneratingThis ? (
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#C25127] animate-pulse">

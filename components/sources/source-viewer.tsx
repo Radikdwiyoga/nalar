@@ -148,7 +148,7 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
         }`}
       >
         {/* Header Bar */}
-        <div className="h-14 px-3 sm:px-4 border-b border-[#E5E0D5] flex items-center justify-between gap-2 shrink-0 bg-[#FAF8F5]/80 backdrop-blur-xs">
+        <div className="h-14 px-3 sm:px-4 border-b border-[#E5E0D5] flex items-center justify-between gap-2 shrink-0 bg-[#FAF8F5]/80 backdrop-blur-sm">
           <div className="flex items-center gap-2 min-w-0 flex-1">
             <div className="w-8 h-8 rounded-lg bg-[#F3EAE2] text-[#C25127] flex items-center justify-center shrink-0">
               <FileText className="w-4 h-4" />
@@ -159,7 +159,7 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
                   {sourceData?.fileName || 'Memuat Dokumen...'}
                 </span>
                 {isPdf && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-red-500/10 text-red-600 border border-red-500/20 shrink-0">
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-500/10 text-red-600 border border-red-500/20 shrink-0">
                     PDF
                   </span>
                 )}
@@ -427,7 +427,7 @@ export function SourceViewer({ sourceId, activeCitation, onClose }: SourceViewer
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Cari kata kunci dalam dokumen ini..."
-                        className="w-full pl-8 pr-8 py-1.5 rounded-lg border bg-background text-xs focus:outline-hidden focus:ring-2 focus:ring-primary/20"
+                        className="w-full pl-8 pr-8 py-1.5 rounded-lg border bg-background text-xs focus:outline-none focus:ring-2 focus:ring-primary/20"
                       />
                       {searchQuery && (
                         <button

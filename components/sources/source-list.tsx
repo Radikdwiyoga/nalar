@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { Source } from '@/lib/types';
 import { formatBytes } from '@/lib/utils';
 import { FileText, Loader2, CheckCircle2, AlertTriangle, Trash2, RotateCw, Search, CheckSquare, Square } from 'lucide-react';
@@ -20,6 +20,7 @@ export function SourceList({
 }: SourceListProps) {
   const [retryingId, setRetryingId] = useState<string | null>(null);
   const [filterQuery, setFilterQuery] = useState('');
+  const triggeredIdsRef = useRef<Set<string>>(new Set());
 
   // Filter sources by search query
   const filteredSources = useMemo(() => {
@@ -28,15 +29,31 @@ export function SourceList({
     return sources.filter((s) => s.file_name.toLowerCase().includes(q));
   }, [sources, filterQuery]);
 
-  // Client-driven ingestion trigger: if any source is queued, trigger ingestion
+  // Client-driven ingestion trigger: fire at most once per queued source ID
   useEffect(() => {
-    const queuedSources = sources.filter((s) => s.status === 'queued');
+    // Prune finished or removed IDs from tracking ref
+    const activeQueuedIds = new Set(
+      sources.filter((s) => s.status === 'queued' || s.status === 'processing').map((s) => s.id)
+    );
+    for (const id of triggeredIdsRef.current) {
+      if (!activeQueuedIds.has(id)) {
+        triggeredIdsRef.current.delete(id);
+      }
+    }
+
+    const queuedSources = sources.filter(
+      (s) => s.status === 'queued' && !triggeredIdsRef.current.has(s.id)
+    );
     if (queuedSources.length === 0) return;
 
     queuedSources.forEach((s) => {
+      triggeredIdsRef.current.add(s.id);
       fetch(`/api/sources/${s.id}/ingest`, { method: 'POST' })
         .then(() => onRefresh())
-        .catch(console.error);
+        .catch((err) => {
+          console.error(err);
+          triggeredIdsRef.current.delete(s.id);
+        });
     });
   }, [sources, onRefresh]);
 

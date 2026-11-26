@@ -33,27 +33,42 @@ export async function POST(request: Request) {
 
   const admin = createAdminClient();
 
-  // 1. Check daily chat quota
+  // 1. Check daily chat & token quota
   const startOfDay = new Date();
   startOfDay.setUTCHours(0, 0, 0, 0);
 
-  const { count: chatCount } = await admin
-    .from('usage_events')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .eq('kind', 'chat')
-    .gte('created_at', startOfDay.toISOString());
+  const [{ data: todayEvents }, { data: profile }] = await Promise.all([
+    admin
+      .from('usage_events')
+      .select('kind, input_tokens, output_tokens')
+      .eq('user_id', user.id)
+      .gte('created_at', startOfDay.toISOString()),
+    admin
+      .from('profiles')
+      .select('daily_chat_limit, daily_token_limit, preferred_provider')
+      .eq('id', user.id)
+      .single(),
+  ]);
 
-  const { data: profile } = await admin
-    .from('profiles')
-    .select('daily_chat_limit')
-    .eq('id', user.id)
-    .single();
+  let chatCount = 0;
+  let usedTokens = 0;
+  for (const ev of todayEvents || []) {
+    if (ev.kind === 'chat') chatCount++;
+    usedTokens += (ev.input_tokens || 0) + (ev.output_tokens || 0);
+  }
 
   const dailyLimit = profile?.daily_chat_limit ?? 100;
-  if (chatCount !== null && chatCount >= dailyLimit) {
+  const dailyTokenLimit = profile?.daily_token_limit ?? 300000;
+
+  if (chatCount >= dailyLimit) {
     return NextResponse.json(
       { error: { code: 'QUOTA_EXCEEDED', message: 'Batas kuota chat harian telah tercapai' } },
+      { status: 429 }
+    );
+  }
+  if (usedTokens >= dailyTokenLimit) {
+    return NextResponse.json(
+      { error: { code: 'TOKEN_QUOTA_EXCEEDED', message: 'Batas kuota token AI harian telah tercapai' } },
       { status: 429 }
     );
   }
@@ -181,6 +196,7 @@ export async function POST(request: Request) {
     chatResult = await chat({
       messages: messagesPayload,
       temperature: options?.temperature ?? 0.2,
+      preferredProvider: profile?.preferred_provider || null,
     });
   } catch (err: any) {
     return NextResponse.json(

@@ -25,11 +25,11 @@ export async function GET(
     return NextResponse.json({ error: { code: 'NOT_FOUND', message: 'Sumber tidak ditemukan' } }, { status: 404 });
   }
 
-  // Create signed URL for download (300 seconds)
+  // Create signed URL for in-app PDF viewer & download (3600 seconds = 1 hour)
   const admin = createAdminClient();
   const { data: signed } = await admin.storage
     .from('sources')
-    .createSignedUrl(source.storage_path, 300);
+    .createSignedUrl(source.storage_path, 3600);
 
   // Fetch chunks for in-app reader & smart citation highlight
   const { data: chunks } = await admin

@@ -12,7 +12,11 @@ import { Loader2, AlertCircle, FileText, Bookmark, CheckCircle2, ArrowRight } fr
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get('next') || '/notebooks';
+  const rawNext = searchParams.get('next') || '/notebooks';
+  const next =
+    rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes('\\')
+      ? rawNext
+      : '/notebooks';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -231,11 +235,11 @@ export default function LoginPage() {
 
             <p className="text-xs text-nalar-text leading-relaxed">
               Berdasarkan klausul pelaksanaan pekerjaan{' '}
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 mx-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] text-[11px] font-semibold">
                 [S1 Hal. 4]
               </span>
               , seluruh kewajiban penyerahan laporan kemajuan mingguan wajib diselesaikan paling lambat 7 hari kerja sebelum termin pencairan kedua{' '}
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 mx-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] text-[11px] font-semibold">
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 mx-0.5 rounded-md bg-[#F3EAE2] text-[#A6421D] border border-[#DFC9B8] text-[11px] font-semibold">
                 [S3]
               </span>.
             </p>

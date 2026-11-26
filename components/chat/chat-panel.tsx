@@ -245,7 +245,7 @@ export function ChatPanel({
           <Sparkles className="w-3.5 h-3.5 text-primary" />
           <span>Tanya Jawab Dokumen</span>
           {messages.length > 0 && (
-            <span className="text-[11px] px-1.5 py-0.2 rounded bg-muted">
+            <span className="text-[11px] px-1.5 py-0.5 rounded bg-muted">
               {messages.length} pesan
             </span>
           )}

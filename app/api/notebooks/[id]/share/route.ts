@@ -3,17 +3,17 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-function parseNotebookMeta(nb: any): { isPublic: boolean; shareToken: string; textDescription: string } {
-  let isPublic = !!nb.is_public;
-  let shareToken = nb.share_token || nb.id;
+function parseNotebookMeta(nb: any): { isPublic: boolean; shareToken: string | null; textDescription: string } {
+  let isPublic = Boolean(nb.is_public);
+  let shareToken: string | null = nb.share_token || null;
   let textDescription = nb.description || '';
 
-  // Fallback to JSON in description if columns do not exist
+  // Legacy fallback if columns do not exist yet and JSON was stored in description
   if (nb.description && nb.description.startsWith('{"_meta":true')) {
     try {
       const parsed = JSON.parse(nb.description);
-      isPublic = !!parsed.isPublic;
-      shareToken = parsed.shareToken || nb.id;
+      isPublic = Boolean(parsed.isPublic);
+      shareToken = parsed.shareToken || shareToken;
       textDescription = parsed.textDescription || '';
     } catch {
       // ignore
@@ -52,7 +52,7 @@ export async function GET(
 
   const { isPublic, shareToken } = parseNotebookMeta(notebook);
   const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://nalar-five.vercel.app';
-  const shareUrl = `${origin}/share/${shareToken}`;
+  const shareUrl = shareToken ? `${origin}/share/${shareToken}` : '';
 
   return NextResponse.json({
     data: {
@@ -94,16 +94,25 @@ export async function POST(
   const enablePublic = Boolean(json?.isPublic);
 
   const meta = parseNotebookMeta(notebook);
-  const shareToken = meta.shareToken || crypto.randomBytes(12).toString('hex');
+  // Always use a cryptographic random token (never fall back to raw notebook UUID unless migrating legacy)
+  const shareToken =
+    meta.shareToken && meta.shareToken !== notebook.id
+      ? meta.shareToken
+      : crypto.randomBytes(16).toString('hex');
 
-  // Try direct columns first
+  // Try direct columns first (also clean description if it previously held _meta JSON)
+  const updatePayload: Record<string, any> = {
+    is_public: enablePublic,
+    share_token: shareToken,
+    updated_at: new Date().toISOString(),
+  };
+  if (notebook.description && notebook.description.startsWith('{"_meta":true')) {
+    updatePayload.description = meta.textDescription || null;
+  }
+
   const { error: directErr } = await admin
     .from('notebooks')
-    .update({
-      is_public: enablePublic,
-      share_token: shareToken,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updatePayload)
     .eq('id', notebookId)
     .eq('user_id', user.id);
 

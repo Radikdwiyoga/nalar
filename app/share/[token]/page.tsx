@@ -27,30 +27,57 @@ function parseNotebookMeta(nb: any): { isPublic: boolean; shareToken: string; te
   return { isPublic, shareToken, textDescription };
 }
 
+const SAFE_TOKEN_REGEX = /^[a-zA-Z0-9_-]{8,64}$/;
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export default async function PublicSharePage({
   params,
 }: {
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
+
+  // Strict token format validation to prevent PostgREST filter injection
+  if (!token || !SAFE_TOKEN_REGEX.test(token)) {
+    notFound();
+  }
+
   const admin = createAdminClient();
 
-  // Try finding notebook by ID or share_token or in description
-  let { data: notebook } = await admin
+  // 1. Lookup via dedicated share_token column
+  let notebook: any = null;
+  const { data: byShareCol, error: shareColErr } = await admin
     .from('notebooks')
-    .select('id, title, description, created_at, user_id')
-    .or(`id.eq.${token},share_token.eq.${token}`)
+    .select('id, title, description, is_public, share_token, created_at, user_id')
+    .eq('share_token', token)
     .maybeSingle();
 
+  if (!shareColErr && byShareCol) {
+    notebook = byShareCol;
+  }
+
+  // 2. Legacy lookup by UUID id if token is a valid UUID
+  if (!notebook && UUID_REGEX.test(token)) {
+    const { data: byId } = await admin
+      .from('notebooks')
+      .select('*')
+      .eq('id', token)
+      .maybeSingle();
+    if (byId) {
+      notebook = byId;
+    }
+  }
+
+  // 3. Targeted legacy fallback (if share_token column migration hasn't been executed yet — no full-table scan)
   if (!notebook) {
-    // Check if token matches description JSON or search all
-    const { data: allNb } = await admin.from('notebooks').select('id, title, description, created_at, user_id');
-    const matched = allNb?.find((nb) => {
-      const meta = parseNotebookMeta(nb);
-      return meta.shareToken === token || nb.id === token;
-    });
-    if (matched) {
-      notebook = matched;
+    const { data: legacyMatch } = await admin
+      .from('notebooks')
+      .select('id, title, description, created_at, user_id')
+      .like('description', `%"shareToken":"${token}"%`)
+      .limit(1)
+      .maybeSingle();
+    if (legacyMatch) {
+      notebook = legacyMatch;
     }
   }
 
