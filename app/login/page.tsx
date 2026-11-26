@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -18,6 +18,7 @@ function LoginForm() {
     rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes('\\')
       ? rawNext
       : '/notebooks';
+  const callbackError = searchParams.get('error');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,32 +26,61 @@ function LoginForm() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createClient();
+  useEffect(() => {
+    if (callbackError === 'auth_callback_failed') {
+      setError('Autentikasi OAuth gagal atau dibatalkan. Pastikan Google Provider sudah aktif di Supabase Dashboard.');
+    }
+    fetch('/api/health')
+      .then(async (r) => {
+        if (!r.ok) {
+          const j = await r.json().catch(() => null);
+          if (j?.message) setError(j.message);
+        }
+      })
+      .catch(() => {});
+  }, [callbackError]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
 
-    if (signInError) {
-      setError(signInError.message);
+      const json = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(json?.error || 'Gagal masuk ke akun Anda.');
+        return;
+      }
+
+      router.push(next);
+      router.refresh();
+    } catch {
+      setError('Tidak dapat terhubung ke server aplikasi. Periksa koneksi internet Anda.');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    router.push(next);
-    router.refresh();
   };
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     setError(null);
     try {
+      const healthRes = await fetch('/api/health').catch(() => null);
+      if (healthRes && !healthRes.ok) {
+        const j = await healthRes.json().catch(() => null);
+        throw new Error(
+          j?.message ||
+            'Database Supabase sedang tidak aktif (Paused). Aktifkan kembali di Supabase Dashboard.'
+        );
+      }
+
+      const supabase = createClient();
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {

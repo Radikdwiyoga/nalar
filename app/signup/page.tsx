@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -21,12 +21,31 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const supabase = createClient();
+  useEffect(() => {
+    fetch('/api/health')
+      .then(async (r) => {
+        if (!r.ok) {
+          const j = await r.json().catch(() => null);
+          if (j?.message) setError(j.message);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleGoogleSignup = async () => {
     setGoogleLoading(true);
     setError(null);
     try {
+      const healthRes = await fetch('/api/health').catch(() => null);
+      if (healthRes && !healthRes.ok) {
+        const j = await healthRes.json().catch(() => null);
+        throw new Error(
+          j?.message ||
+            'Database Supabase sedang tidak aktif (Paused). Aktifkan kembali di Supabase Dashboard.'
+        );
+      }
+
+      const supabase = createClient();
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -51,28 +70,32 @@ export default function SignupPage() {
       return;
     }
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName.trim(),
-        },
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=/notebooks`,
-      },
-    });
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: fullName.trim(),
+          email: email.trim(),
+          password,
+        }),
+      });
 
-    if (signUpError) {
-      setError(signUpError.message);
-      setLoading(false);
-      return;
-    }
+      const json = await res.json().catch(() => null);
+      if (!res.ok) {
+        setError(json?.error || 'Gagal mendaftarkan akun baru.');
+        return;
+      }
 
-    if (data?.session) {
-      router.push('/notebooks');
-      router.refresh();
-    } else {
-      setSuccess(true);
+      if (json?.hasSession) {
+        router.push('/notebooks');
+        router.refresh();
+      } else {
+        setSuccess(true);
+      }
+    } catch {
+      setError('Tidak dapat terhubung ke server aplikasi. Periksa koneksi internet Anda.');
+    } finally {
       setLoading(false);
     }
   };

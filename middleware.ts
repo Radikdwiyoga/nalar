@@ -30,9 +30,14 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data?.user ?? null;
+  } catch {
+    // Prevent Edge Middleware 500 crash if Supabase is temporarily unreachable or paused
+    user = null;
+  }
 
   const isAuthPage =
     request.nextUrl.pathname.startsWith('/login') ||
@@ -52,7 +57,7 @@ export async function middleware(request: NextRequest) {
 
   if (user && isAuthPage) {
     const url = request.nextUrl.clone();
-    url.pathname = '/dashboard';
+    url.pathname = '/notebooks';
     return NextResponse.redirect(url);
   }
 
